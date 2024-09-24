@@ -25,7 +25,11 @@ public:
 	void ProcessSkill();
 	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
 
+	//inherited Interface
+	virtual void PerformSkillHitCheck();
+
 public:
+
 	FCharacterSkillComponentOnSkillEndSignature OnSkillEnd;
 
 protected:
@@ -48,7 +52,9 @@ protected:
 	FTimerHandle ComboTimerHandle;
 	bool bHasNextComboCommand = false;
 
-	virtual void PerformSkillHitCheck();
+
+	
+private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
 
 private:

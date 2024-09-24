@@ -15,7 +15,7 @@ enum class ECharacterControlType : uint8
 };
 
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter 
+class ARENABATTLE_API AABCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 

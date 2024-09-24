@@ -193,16 +193,9 @@ void AABCharacterPlayer::Attack()
 {
 	if (BasicSkillComponent)
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 		BasicSkillComponent->ProcessSkill();
-		BasicSkillComponent->OnSkillEnd.BindUObject(this, &AABCharacterPlayer::OnSkillEnd);
 	}
 }
 
-void AABCharacterPlayer::OnSkillEnd()
-{
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	UE_LOG(LogTemp, Log, TEXT("SKILL END"));
-}
 
 

@@ -2,7 +2,7 @@
 
 
 #include "Animation/AnimNotify_AttackHitCheck.h"
-#include "Interface/ABAnimationAttackInterface.h"
+#include "CharacterSkill/ABCharacterSkillComponent.h"
 
 void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -10,11 +10,11 @@ void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 
 	if (MeshComp)
 	{
-		IABAnimationAttackInterface* AttackPawn = Cast<IABAnimationAttackInterface>(MeshComp->GetOwner());
+		UABCharacterSkillComponent* SkillComponent = MeshComp->GetOwner()->GetComponentByClass<UABCharacterSkillComponent>();
 
-		if (AttackPawn)
+		if (SkillComponent)
 		{
-			AttackPawn->PerformSkillHitCheck();
+			SkillComponent->PerformSkillHitCheck();
 		}
 	}
 }

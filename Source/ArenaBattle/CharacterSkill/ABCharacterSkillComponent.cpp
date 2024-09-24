@@ -4,6 +4,7 @@
 #include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Animation/AnimMontage.h"
 #include "Character/ABComboActionData.h"
@@ -34,6 +35,7 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		FRotator DesiredRotation = ComboDirection.Rotation();
 		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f);
 		GetOwner()->SetActorRotation(NewRotation);
+		ComboDirection = NewRotation.Vector();
 
 		//end rotate
 		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
@@ -65,12 +67,15 @@ void UABCharacterSkillComponent::ProcessSkill()
 
 void UABCharacterSkillComponent::SkillBegin()
 {
-	UE_LOG(LogTemp, Log, TEXT("SKILL BEGIN"));
 	float AttackSpeedRate = SkillData->ComboActionData->AnimationSpeedRate;
+
 	USkeletalMeshComponent* SkeletalMesh = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
-	
 	UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
+
+	//character stop
+	UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
+	Movement->SetMovementMode(EMovementMode::MOVE_None);
 
 	CurrentCombo = 1;
 
@@ -93,6 +98,10 @@ void UABCharacterSkillComponent::SkillBegin()
 
 void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
+	//character move
+	UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
+	Movement->SetMovementMode(EMovementMode::MOVE_Walking);
+
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
 	OnSkillEnd.ExecuteIfBound();
@@ -130,7 +139,12 @@ void UABCharacterSkillComponent::ComboCheck()
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
 		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
 		SetComboCheckTimer();
+
+		UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
 		bCanRedirection = true;
+		FVector DesiredDirection = Movement->GetLastInputVector();
+		TrySetSkillDirection(DesiredDirection);
+
 		bHasNextComboCommand = false;
 	}
 }
@@ -168,6 +182,11 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 		FDamageEvent DamageEvent;
 		ACharacter* Owner = Cast<ACharacter>(GetOwner());
 		OutHitResult.GetActor()->TakeDamage(SkillData->SkillRawDamage, DamageEvent, Owner->GetController(), Owner);
+
+		//for (auto Actor : OutHitResult)
+		//{
+
+		//}
 
 	}
 

@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (ToolTip = "Forward, Width, Height"))
 	FVector3f SkillExtent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (ToolTip = "-1 is just Frame"))
+	float SkillEffectiveTime = -1.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
 	float SkillRawDamage;
 
