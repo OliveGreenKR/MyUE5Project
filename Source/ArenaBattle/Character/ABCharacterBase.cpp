@@ -57,22 +57,17 @@ AABCharacterBase::AABCharacterBase()
 	{
 		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderRef.Object);
 	}
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/AM_ComboAttack.AM_ComboAttack'"));
-	if (ComboActionMontageRef.Object)
-	{
-		ComboActionMontage = ComboActionMontageRef.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
-	if (ComboActionDataRef.Object)
-	{
-		ComboActionData = ComboActionDataRef.Object;
-	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/Warriors/AM_Dead.AM_Dead'"));
 	if (DeadMontageRef.Object)
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
-
+	//static ConstructorHelpers::FObjectFinder<UABCharacterSkillComponent> BasicSwordSkillRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ArenaBattle/Input/Actions/IA_Attack.IA_Attack'"));
+	//if (nullptr != BasicSwordSkillRef.Object)
+	//{
+	//	BasicSwordSkillComponent = BasicSwordSkillRef.Object;
+	//}
 
 }
 
@@ -92,20 +87,6 @@ void AABCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	//Combo Redirection forcely
-	if (bIsRedirectioning)
-	{
-		FRotator CurrentRotation = GetActorRotation();
-		FRotator DesiredRotation = ComboDirection.Rotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f);
-		SetActorRotation(NewRotation);
-
-		//end rotate
-		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
-		{
-			bIsRedirectioning = false;
-		}
-	}
 #pragma region Debug
 	if (bDrawDebug)
 	{
@@ -132,6 +113,11 @@ void AABCharacterBase::Tick(float DeltaTime)
 	
 }
 
+void AABCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 //FVector AABCharacterBase::GetCurrentCharacterForward()
 //{
 //	
@@ -144,101 +130,6 @@ void AABCharacterBase::Tick(float DeltaTime)
 //		return GetActorForwardVector();
 //	}
 //}
-
-void AABCharacterBase::ProcessComboCommand()
-{
-	//Frist Combo
-	if (!IsCombo() && !GetCharacterMovement()->IsFalling())
-	{
-		ComboActionBegin();
-		return;
-	}
-
-	bHasNextComboCommand = ComboTimerHandle.IsValid();
-}
-
-void AABCharacterBase::ComboActionBegin()
-{
-	float AttackSpeedRate = ComboActionData->AnimationSpeedRate;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	ensureMsgf(AnimInstance, TEXT("%s doesn't have Combo Montage!"), *GetName());
-	
-	CurrentCombo = 1;
-
-	//Stop Character Movement
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	//Set deffault ComboDireciton 
-	ComboDirection = GetActorForwardVector();
-
-	//TimerSet
-	ComboTimerHandle.Invalidate();
-	SetComboCheckTimer();
-
-	//Play Anim
-	AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
-
-	//Set Montage End Deligate
-	FOnMontageEnded EndDeligate;
-	EndDeligate.BindUObject(this, &AABCharacterBase::ComboActionEnd);
-	AnimInstance->Montage_SetEndDelegate(EndDeligate, ComboActionMontage);
-}
-
-void AABCharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
-{
-	ensure(CurrentCombo != 0);
-	CurrentCombo = 0;
-
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-}
-
-
-void AABCharacterBase::SetComboCheckTimer()
-{
-	int32 ComboIndex = CurrentCombo - 1;
-	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-
-	float AttackSpeedRate = ComboActionData->AnimationSpeedRate;
-	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) * ComboActionMontage->GetSectionLength(ComboIndex);
-	ComboEffectiveTime = ComboEffectiveTime / AttackSpeedRate;
-	if (ComboEffectiveTime < 0)
-	{
-		return;
-	}
-
-	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &AABCharacterBase::ComboCheck, ComboEffectiveTime, false);
-}
-
-void AABCharacterBase::ComboCheck()
-{
-	ComboTimerHandle.Invalidate();
-	//Check Next Command
-	if (bHasNextComboCommand)
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
-		
-		//Play Next Combo Animation
-		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
-		AnimInstance->Montage_JumpToSection(NextSection, ComboActionMontage);
-		SetComboCheckTimer();
-		bCanRedirection = true;
-		bHasNextComboCommand = false;
-	}
-}
-
-bool AABCharacterBase::TrySetComboDirection(FVector InDesiredDirection)
-{
-	//during redirectioning, can not set direction.
-	if (bCanRedirection == false )
-	{
-		return false;
-	}
-	//start redirectioning
-	ComboDirection = InDesiredDirection;
-	bIsRedirectioning = true;
-	bCanRedirection = false;
-	return true;
-}
 
 void AABCharacterBase::DrawDebugForwardArrow(float InSeconds, FColor Color)
 {
@@ -255,45 +146,6 @@ void AABCharacterBase::DrawDebugdArrow(FVector InDirection, float InSeconds, FCo
 	FVector EndLocation = StartLocation + InDirection.GetSafeNormal() * 100.f;
 
 	DrawDebugDirectionalArrow(GetWorld(), StartLocation, EndLocation, 50.0f, Color , false, InSeconds, 0, 5.0f);
-}
-
-void AABCharacterBase::PerformSkillHitCheck()
-{
-	FHitResult OutHitResult;
-	//tag :Attack
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-
-	const float AttackRange = 40.0f;
-	const float AttackRadius = 50.0f;
-	const float AttackDamage = 30.0f;
-	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-	const FVector End = Start + GetActorForwardVector() * AttackRange;
-
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_ABACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
-	if (HitDetected)
-	{
-		FDamageEvent DamageEvent;
-		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-	}
-
-	if (bDrawDebug)
-	{
-		FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-		float CapsuleHalfHeight = AttackRange * 0.5f;
-		FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-
-		DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 2.0f);
-	}
-}
-
-float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	//Stat->ApplyDamage(DamageAmount);
-
-	SetDead();
-
-	return DamageAmount;
 }
 
 void AABCharacterBase::SetDead()

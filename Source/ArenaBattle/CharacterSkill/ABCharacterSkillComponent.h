@@ -42,12 +42,6 @@ protected:
 	bool TrySetSkillDirection(FVector& InDesiredDirection);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> SkillMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UABComboActionData> ComboActionData;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABSkillData> SkillData;
 

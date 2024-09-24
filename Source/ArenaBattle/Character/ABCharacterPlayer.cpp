@@ -1,16 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Character/ABCharacterPlayer.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+//#include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/ABCharacterControlData.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Physics/ABCollision.h"
-#include "Engine/DamageEvents.h"
-
+#include "CharacterSkill/ABCharacterSkillComponent.h"
 
 AABCharacterPlayer::AABCharacterPlayer()
 {
@@ -193,55 +191,10 @@ void AABCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 
 void AABCharacterPlayer::Attack()
 {
-	ProcessComboCommand();
-}
-
-void AABCharacterPlayer::ComboCheck()
-{
-	Super::ComboCheck();
-
-	FVector DesiredDirection;
-
-	DesiredDirection = GetCharacterMovement()->GetLastInputVector();
-	TrySetComboDirection(DesiredDirection);
-}
-
-void AABCharacterPlayer::PerformSkillHitCheck()
-{
-	//Collision check with 'ABAction' Trace Channel
-	FHitResult OutHitResult;
-	TArray<FHitResult> OutHitResults;
-	//when analyzing tags, used Identifier info.
-		//UnrealSCENE_QUERY_STAY로 tag 추가 가능
-		//언리얼이 제공하는 분석툴에서 tag를 기준으로 analyze.
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-
-	//TODO : Attack Info to Data Asset.
-		//Ragne, Shape, Effective time, TraceMethod, Channel... etc
-	const float AttackForward = 80.0f;
-	const float AttackWidth = 80.0f;
-	const float AttackHeight = 50.0f;
-	
-	const FVector HalfBox = FVector(AttackForward, AttackWidth, AttackHeight );
-	const FQuat BoxRotation = FRotationMatrix::MakeFromXZ(GetActorForwardVector(), FVector::UpVector).ToQuat(); //forward to unit:x
-	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-	const FVector End = Start + GetActorForwardVector() * AttackForward;
-
-	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, BoxRotation, CCHANNEL_ABACTION, FCollisionShape::MakeBox(HalfBox), Params);
-
-	if (bDrawDebug)
+	if (BasicSwordSkillComponent)
 	{
-		FVector AttackCenterPoint = Start + (End - Start) * 0.5f;
-		FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-
-		DrawDebugBox(GetWorld(), AttackCenterPoint, HalfBox, BoxRotation, DrawColor, false, 1.5f);
-
-		// Draw debug boxes for each hit result
-		for (const FHitResult& HitResult : OutHitResults)
-		{
-			DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(10.0f), FQuat::Identity, FColor::Blue, false, 1.5f);
-		}
+		BasicSwordSkillComponent->ProcessSkill();
 	}
-
 }
+
 

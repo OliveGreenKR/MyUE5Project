@@ -41,6 +41,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
 	float SkillRawDamage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> SkillMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UABComboActionData> ComboActionData;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill )
 	ESkillCollisionShape CollisionShapeType = ESkillCollisionShape::Box;

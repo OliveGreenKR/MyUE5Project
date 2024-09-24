@@ -59,12 +59,8 @@ protected:
 
 	void ShoulderMove(const FInputActionValue& Value);
 	void ShoulderLook(const FInputActionValue& Value);
-
 	void QuaterMove(const FInputActionValue& Value);
 	void Attack();
-//Combo Section
-	virtual void ComboCheck() override;
-	virtual void PerformSkillHitCheck() override;
 
 protected:
 	ECharacterControlType CurrentCharacterControlType;

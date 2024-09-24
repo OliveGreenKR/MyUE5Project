@@ -16,16 +16,16 @@ UABCharacterSkillComponent::UABCharacterSkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> SkillMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/AM_ComboAttack.AM_ComboAttack'"));
-	if (SkillMontageRef.Object)
-	{
-		SkillMontage = SkillMontageRef.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
-	if (ComboActionDataRef.Object)
-	{
-		ComboActionData = ComboActionDataRef.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UAnimMontage> SkillMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/AM_ComboAttack.AM_ComboAttack'"));
+	//if (SkillMontageRef.Object)
+	//{
+	//	SkillMontage = SkillMontageRef.Object;
+	//}
+	//static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
+	//if (ComboActionDataRef.Object)
+	//{
+	//	ComboActionData = ComboActionDataRef.Object;
+	//}
 	//static ConstructorHelpers::FObjectFinder<UABSkillData> SkillDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
 	//if (SkillDataRef.Object)
 	//{
@@ -56,6 +56,8 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UABCharacterSkillComponent::BeginPlay()
 {
+	Super::BeginPlay();
+
 	check(Cast<ACharacter>(GetOwner()));
 }
 
@@ -73,7 +75,7 @@ void UABCharacterSkillComponent::ProcessSkill()
 
 void UABCharacterSkillComponent::SkillBegin()
 {
-	float AttackSpeedRate = ComboActionData->AnimationSpeedRate;
+	float AttackSpeedRate = SkillData->ComboActionData->AnimationSpeedRate;
 	USkeletalMeshComponent* SkeletalMesh = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
 	
 	UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance();
@@ -89,12 +91,12 @@ void UABCharacterSkillComponent::SkillBegin()
 	SetComboCheckTimer();
 
 	//Play Anim
-	AnimInstance->Montage_Play(SkillMontage, AttackSpeedRate);
+	AnimInstance->Montage_Play(SkillData->SkillMontage, AttackSpeedRate);
 
 	//Set Montage End Deligate
 	FOnMontageEnded EndDeligate;
 	EndDeligate.BindUObject(this, &UABCharacterSkillComponent::SkillEnd);
-	AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillData->SkillMontage);
 	
 }
 
@@ -109,10 +111,11 @@ void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsPr
 void UABCharacterSkillComponent::SetComboCheckTimer()
 {
 	int32 ComboIndex = CurrentCombo - 1;
+	UABComboActionData* ComboActionData = SkillData->ComboActionData;
 	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
 	float AttackSpeedRate = ComboActionData->AnimationSpeedRate;
-	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) * SkillMontage->GetSectionLength(ComboIndex);
+	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) * SkillData->SkillMontage->GetSectionLength(ComboIndex);
 	ComboEffectiveTime = ComboEffectiveTime / AttackSpeedRate;
 	if (ComboEffectiveTime < 0)
 	{
@@ -128,13 +131,14 @@ void UABCharacterSkillComponent::ComboCheck()
 	//Check Next Command
 	if (bHasNextComboCommand)
 	{
+		UABComboActionData* ComboActionData = SkillData->ComboActionData;
 		USkeletalMeshComponent* SkeletalMesh = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
 		UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance();
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
 
 		//Play Next Combo Animation
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
-		AnimInstance->Montage_JumpToSection(NextSection, SkillMontage);
+		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
 		SetComboCheckTimer();
 		bCanRedirection = true;
 		bHasNextComboCommand = false;

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interface/ABAnimationAttackInterface.h"
 #include "ABCharacterBase.generated.h"
 
 UENUM()
@@ -16,7 +15,7 @@ enum class ECharacterControlType : uint8
 };
 
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter , public IABAnimationAttackInterface
+class ARENABATTLE_API AABCharacterBase : public ACharacter 
 {
 	GENERATED_BODY()
 
@@ -27,53 +26,18 @@ public:
 protected:
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData);
 	virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
 protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
 
-#pragma region Skill
+
+#pragma region Skill Components
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
-	TArray<TObjectPtr<class UABCharacterSkillComponent>> CharacterSkills;
-
-
-	void ProcessComboCommand();
-	void ComboActionBegin();
-	void ComboActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-	void SetComboCheckTimer();
-	/// <summary>
-	/// Called When ComboTimer time out.
-	/// </summary>
-	virtual void ComboCheck();
-
-	inline bool IsCombo() { return (CurrentCombo > 0); }
-	UFUNCTION(BlueprintCallable, Category = "Combo")
-	bool TrySetComboDirection(FVector InDesiredDirection);
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category =  Animation)
-	TObjectPtr<class UAnimMontage> ComboActionMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UABComboActionData> ComboActionData;
-
-	int32 CurrentCombo = 0;
-	FTimerHandle ComboTimerHandle;
-	bool bHasNextComboCommand = false;
-
-private:
-	//When ComboMontage Begins, try to rotate to this.
-	FVector ComboDirection;
-	bool bCanRedirection = false;
-	bool bIsRedirectioning = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UABCharacterSkillComponent> BasicSwordSkillComponent;
 
 #pragma endregion
-#pragma region Attack Hit
-protected:
-	virtual void PerformSkillHitCheck() override;
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-#pragma endregion
-
 #pragma region Debug
 protected:
 	void DrawDebugForwardArrow(float InSeconds, FColor Color = FColor::Red);
