@@ -34,8 +34,9 @@ protected:
 
 #pragma region Skill Components
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UABCharacterSkillComponent> BasicSwordSkillComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UABCharacterSkillComponent> BasicSkillComponent;
+
 
 #pragma endregion
 #pragma region Debug

@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Character/ABCharacterControlData.h"
+#include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "Animation/AnimMontage.h"
 #include "ABComboActionData.h"
 #include "Physics/ABCollision.h"
@@ -14,6 +15,8 @@
 // Sets default values
 AABCharacterBase::AABCharacterBase()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Pawn
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -63,12 +66,10 @@ AABCharacterBase::AABCharacterBase()
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
-	//static ConstructorHelpers::FObjectFinder<UABCharacterSkillComponent> BasicSwordSkillRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ArenaBattle/Input/Actions/IA_Attack.IA_Attack'"));
-	//if (nullptr != BasicSwordSkillRef.Object)
-	//{
-	//	BasicSwordSkillComponent = BasicSwordSkillRef.Object;
-	//}
 
+
+	//SKill Component
+	BasicSkillComponent = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkillComponent"));
 }
 
 void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* InCharacterControlData)
@@ -108,6 +109,12 @@ void AABCharacterBase::Tick(float DeltaTime)
 			0,
 			1.0f    // Thickness of the lines
 		);
+
+		if (BasicSkillComponent)
+		{
+			BasicSkillComponent->SetDrawDebug(true);
+		}
+
 	}
 #pragma endregion
 	
@@ -117,19 +124,6 @@ void AABCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-//FVector AABCharacterBase::GetCurrentCharacterForward()
-//{
-//	
-//	if (GetCharacterMovement()->bOrientRotationToMovement)
-//	{
-//		return GetMovementComponent()->UpdatedComponent->GetComponentRotation().Vector();
-//	}
-//	else
-//	{
-//		return GetActorForwardVector();
-//	}
-//}
 
 void AABCharacterBase::DrawDebugForwardArrow(float InSeconds, FColor Color)
 {

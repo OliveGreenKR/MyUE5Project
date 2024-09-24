@@ -16,21 +16,11 @@ UABCharacterSkillComponent::UABCharacterSkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	//static ConstructorHelpers::FObjectFinder<UAnimMontage> SkillMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/AM_ComboAttack.AM_ComboAttack'"));
-	//if (SkillMontageRef.Object)
-	//{
-	//	SkillMontage = SkillMontageRef.Object;
-	//}
-	//static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
-	//if (ComboActionDataRef.Object)
-	//{
-	//	ComboActionData = ComboActionDataRef.Object;
-	//}
-	//static ConstructorHelpers::FObjectFinder<UABSkillData> SkillDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
-	//if (SkillDataRef.Object)
-	//{
-	//	SkillData = SkillDataRef.Object;
-	//}
+	static ConstructorHelpers::FObjectFinder<UABSkillData> SkillDataRef(TEXT("/Script/ArenaBattle.ABSkillData'/Game/ArenaBattle/Skill/ABS_BasicSwordSkill.ABS_BasicSwordSkill'"));
+	if (SkillDataRef.Object)
+	{
+		SkillData = SkillDataRef.Object;
+	}
 
 }
 
@@ -64,7 +54,7 @@ void UABCharacterSkillComponent::BeginPlay()
 void UABCharacterSkillComponent::ProcessSkill()
 {
 	//First
-	if (!IsCombo() && bSkillEnable)
+	if (!IsCombo())
 	{
 		SkillBegin();
 		return;
@@ -75,6 +65,7 @@ void UABCharacterSkillComponent::ProcessSkill()
 
 void UABCharacterSkillComponent::SkillBegin()
 {
+	UE_LOG(LogTemp, Log, TEXT("SKILL BEGIN"));
 	float AttackSpeedRate = SkillData->ComboActionData->AnimationSpeedRate;
 	USkeletalMeshComponent* SkeletalMesh = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
 	

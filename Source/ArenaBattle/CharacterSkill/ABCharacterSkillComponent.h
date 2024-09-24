@@ -9,7 +9,7 @@
 
 DECLARE_DELEGATE(FCharacterSkillComponentOnSkillEndSignature);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENABATTLE_API UABCharacterSkillComponent : public UActorComponent, public IABAnimationAttackInterface
 {
 	GENERATED_BODY()
@@ -23,8 +23,8 @@ public:
 	virtual void BeginPlay() override;
 
 	void ProcessSkill();
-	inline void SetDrawDebug(bool InBool) { bSkillEnable = InBool; }
-	inline void SetSkilEnable(bool InBool) { bIsRedirectioning = InBool; }
+	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
+	inline void SetSkilEnable(bool InBool) { bSkillEnable = InBool; }
 
 public:
 	FCharacterSkillComponentOnSkillEndSignature OnSkillEnd;

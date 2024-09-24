@@ -191,10 +191,18 @@ void AABCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 
 void AABCharacterPlayer::Attack()
 {
-	if (BasicSwordSkillComponent)
+	if (BasicSkillComponent)
 	{
-		BasicSwordSkillComponent->ProcessSkill();
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		BasicSkillComponent->ProcessSkill();
+		BasicSkillComponent->OnSkillEnd.BindUObject(this, &AABCharacterPlayer::OnSkillEnd);
 	}
+}
+
+void AABCharacterPlayer::OnSkillEnd()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	UE_LOG(LogTemp, Log, TEXT("SKILL END"));
 }
 
 

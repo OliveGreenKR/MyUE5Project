@@ -62,7 +62,12 @@ protected:
 	void QuaterMove(const FInputActionValue& Value);
 	void Attack();
 
+//Skill Section
+	void OnSkillEnd();
+
 protected:
 	ECharacterControlType CurrentCharacterControlType;
+
+
 	
 };
