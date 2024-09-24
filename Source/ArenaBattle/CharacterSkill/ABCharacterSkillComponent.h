@@ -42,7 +42,7 @@ protected:
 	inline bool IsCombo() const { return (CurrentCombo > 0); }
 
 	UFUNCTION(BlueprintCallable, Category = "Combo")
-	bool TrySetSkillDirection(FVector& InDesiredDirection);
+	bool SetSkillDirection( const FVector InDesiredDirection);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
@@ -52,7 +52,6 @@ protected:
 	FTimerHandle ComboTimerHandle;
 	bool bHasNextComboCommand = false;
 
-
 	
 private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
@@ -60,9 +59,6 @@ private:
 private:
 	//When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
-	bool bCanRedirection = true;
 	bool bIsRedirectioning = false;
-
-private:
 	bool bDrawDebug = false;
 };

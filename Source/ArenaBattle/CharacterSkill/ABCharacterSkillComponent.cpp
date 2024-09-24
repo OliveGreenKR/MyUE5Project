@@ -82,9 +82,7 @@ void UABCharacterSkillComponent::SkillBegin()
 	Movement->SetMovementMode(EMovementMode::MOVE_None);
 
 	//Set deffault ComboDireciton 
-	bCanRedirection = true;
-	FVector DesiredDirection = Movement->GetLastInputVector();
-	TrySetSkillDirection(DesiredDirection);
+	SetSkillDirection(Movement->GetLastInputVector());
 
 	//TimerSet
 	ComboTimerHandle.Invalidate();
@@ -145,25 +143,23 @@ void UABCharacterSkillComponent::ComboCheck()
 		SetComboCheckTimer();
 
 		UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
-		FVector DesiredDirection = Movement->GetLastInputVector();
-		bCanRedirection = true;
-		TrySetSkillDirection(DesiredDirection);
+		SetSkillDirection(Movement->GetLastInputVector());
 
 		bHasNextComboCommand = false;
 	}
 }
 
-bool UABCharacterSkillComponent::TrySetSkillDirection(FVector& InDesiredDirection)
+bool UABCharacterSkillComponent::SetSkillDirection( const FVector InDesiredDirection)
 {
-	//during redirectioning, can not set direction.
-	if (bCanRedirection == false)
-	{
-		return false;
-	}
+	////during redirectioning, can not set direction.
+	//if (bCanRedirection == false)
+	//{
+	//	return false;
+	//}
 	//start redirectioning
 	ComboDirection = InDesiredDirection;
 	bIsRedirectioning = true;
-	bCanRedirection = false;
+	//bCanRedirection = false;
 	return true;
 }
 
