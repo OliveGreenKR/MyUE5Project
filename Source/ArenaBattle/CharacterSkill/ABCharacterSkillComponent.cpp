@@ -165,7 +165,7 @@ bool UABCharacterSkillComponent::TrySetSkillDirection(FVector& InDesiredDirectio
 
 void UABCharacterSkillComponent::PerformSkillHitCheck()
 {
-	FHitResult OutHitResult;
+	TArray<FHitResult> OutHitResults;
 	//tag :Attack
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, GetOwner());
 
@@ -175,28 +175,34 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	const FVector Start = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * CapsuleComponent->GetScaledCapsuleRadius();
 	const FVector End = Start + GetOwner()->GetActorForwardVector() * SkillData->SkillExtent.X;
 
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_ABACTION, SkillData->GetCollisionShape(), Params);
+	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, FQuat::Identity, CCHANNEL_ABACTION, SkillData->GetCollisionShape(), Params);
 	if (HitDetected)
 	{
 
 		FDamageEvent DamageEvent;
 		ACharacter* Owner = Cast<ACharacter>(GetOwner());
-		OutHitResult.GetActor()->TakeDamage(SkillData->SkillRawDamage, DamageEvent, Owner->GetController(), Owner);
 
-		//for (auto Actor : OutHitResult)
-		//{
-
-		//}
+		for (const FHitResult& HitResult : OutHitResults)
+		{
+			HitResult.GetActor()->TakeDamage(SkillData->SkillRawDamage, DamageEvent, Owner->GetController(), Owner);
+		}
 
 	}
 
 	if (bDrawDebug)
 	{
+
 		const FVector Origin = Start + (End - Start) * 0.5f;
 		const FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 		const FQuat DebugQuat = FRotationMatrix::MakeFromZ(GetOwner()->GetActorForwardVector()).ToQuat();
+		const float DebugDuration = 1.0f;
+		DrawDebugSkillCollision(Origin, DebugQuat, DrawColor, DebugDuration);
+	
+		for (const FHitResult& HitResult : OutHitResults)
+		{
+			DrawDebugBox(GetWorld(),HitResult.GetActor()->GetActorLocation(), FVector(10.0f), FColor::Blue, false, DebugDuration);
+		}
 
-		DrawDebugSkillCollision(Origin, DebugQuat, DrawColor, 1.0f);
 	}
 }
 
