@@ -95,7 +95,6 @@ void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsPr
 {
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
-	bSkillEnable = false;
 	OnSkillEnd.ExecuteIfBound();
 }
 

@@ -24,7 +24,6 @@ public:
 
 	void ProcessSkill();
 	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
-	inline void SetSkilEnable(bool InBool) { bSkillEnable = InBool; }
 
 public:
 	FCharacterSkillComponentOnSkillEndSignature OnSkillEnd;
@@ -57,7 +56,6 @@ private:
 	FVector ComboDirection;
 	bool bCanRedirection = false;
 	bool bIsRedirectioning = false;
-	bool bSkillEnable = false;
 
 private:
 	bool bDrawDebug = false;
