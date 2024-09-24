@@ -35,12 +35,12 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		FRotator DesiredRotation = ComboDirection.Rotation();
 		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f);
 		GetOwner()->SetActorRotation(NewRotation);
-		ComboDirection = NewRotation.Vector();
 
 		//end rotate
 		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
 		{
 			bIsRedirectioning = false;
+			GetOwner()->SetActorRotation(DesiredRotation);
 		}
 	}
 
@@ -73,14 +73,18 @@ void UABCharacterSkillComponent::SkillBegin()
 	UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
 
-	//character stop
-	UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
-	Movement->SetMovementMode(EMovementMode::MOVE_None);
-
 	CurrentCombo = 1;
 
+	
+	UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
+	
+	//character stop
+	Movement->SetMovementMode(EMovementMode::MOVE_None);
+
 	//Set deffault ComboDireciton 
-	ComboDirection = GetOwner()->GetActorForwardVector();
+	bCanRedirection = true;
+	FVector DesiredDirection = Movement->GetLastInputVector();
+	TrySetSkillDirection(DesiredDirection);
 
 	//TimerSet
 	ComboTimerHandle.Invalidate();
@@ -141,8 +145,8 @@ void UABCharacterSkillComponent::ComboCheck()
 		SetComboCheckTimer();
 
 		UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
-		bCanRedirection = true;
 		FVector DesiredDirection = Movement->GetLastInputVector();
+		bCanRedirection = true;
 		TrySetSkillDirection(DesiredDirection);
 
 		bHasNextComboCommand = false;
@@ -171,11 +175,12 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 	UCapsuleComponent* CapsuleComponent = GetOwner()->GetComponentByClass<UCapsuleComponent>();
 
-	const FQuat BoxRotation = FRotationMatrix::MakeFromXZ(GetOwner()->GetActorForwardVector(), FVector::UpVector).ToQuat(); //forward to unit:x
-	const FVector Start = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * CapsuleComponent->GetScaledCapsuleRadius();
-	const FVector End = Start + GetOwner()->GetActorForwardVector() * SkillData->SkillExtent.X;
 
-	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, FQuat::Identity, CCHANNEL_ABACTION, SkillData->GetCollisionShape(), Params);
+	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
+	const FVector Start = GetOwner()->GetActorLocation() + ComboDirection * CapsuleComponent->GetScaledCapsuleRadius();
+	const FVector End = Start + ComboDirection * SkillData->SkillExtent.X;
+
+	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, SkillData->GetCollisionShape(), Params);
 	if (HitDetected)
 	{
 
@@ -191,16 +196,14 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 	if (bDrawDebug)
 	{
-
 		const FVector Origin = Start + (End - Start) * 0.5f;
 		const FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-		const FQuat DebugQuat = FRotationMatrix::MakeFromZ(GetOwner()->GetActorForwardVector()).ToQuat();
 		const float DebugDuration = 1.0f;
-		DrawDebugSkillCollision(Origin, DebugQuat, DrawColor, DebugDuration);
+		DrawDebugSkillCollision(Origin, CollisionRotation, DrawColor, DebugDuration);
 	
 		for (const FHitResult& HitResult : OutHitResults)
 		{
-			DrawDebugBox(GetWorld(),HitResult.GetActor()->GetActorLocation(), FVector(10.0f), FColor::Blue, false, DebugDuration);
+			DrawDebugBox(GetWorld(),HitResult.GetActor()->GetActorLocation(), FVector(20.0f), FColor::Blue, false, DebugDuration);
 		}
 
 	}

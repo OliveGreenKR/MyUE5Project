@@ -42,7 +42,7 @@ public:
 	float SkillEffectiveTime = -1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
-	float SkillRawDamage;
+	float SkillRawDamage = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> SkillMontage;

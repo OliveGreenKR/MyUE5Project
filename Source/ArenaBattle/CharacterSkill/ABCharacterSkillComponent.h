@@ -60,7 +60,7 @@ private:
 private:
 	//When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
-	bool bCanRedirection = false;
+	bool bCanRedirection = true;
 	bool bIsRedirectioning = false;
 
 private:
