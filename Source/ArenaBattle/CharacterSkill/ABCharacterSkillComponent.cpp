@@ -80,7 +80,6 @@ void UABCharacterSkillComponent::SkillBegin()
 	
 	//character stop
 	Movement->SetMovementMode(EMovementMode::MOVE_None);
-	Movement->Jump
 
 	//Set deffault ComboDireciton 
 	SetSkillDirection(Movement->GetLastInputVector());

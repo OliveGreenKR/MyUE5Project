@@ -125,6 +125,14 @@ void AABCharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
+float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float InTrueDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	SetDead();
+
+	return InTrueDamage;
+}
+
 void AABCharacterBase::DrawDebugForwardArrow(float InSeconds, FColor Color)
 {
 	FVector StartLocation = GetActorLocation();

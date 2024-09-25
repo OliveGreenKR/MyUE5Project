@@ -27,6 +27,8 @@ protected:
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData);
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
@@ -36,9 +38,8 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABCharacterSkillComponent> BasicSkillComponent;
-
-
 #pragma endregion
+
 #pragma region Debug
 protected:
 	void DrawDebugForwardArrow(float InSeconds, FColor Color = FColor::Red);
