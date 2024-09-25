@@ -57,6 +57,8 @@ private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
 
 private:
+	ACharacter* OwnerCharacter;
+
 	//When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
 	bool bIsRedirectioning = false;

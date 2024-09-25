@@ -50,7 +50,8 @@ void UABCharacterSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	check(Cast<ACharacter>(GetOwner()));
+	OwnerCharacter = Cast<ACharacter>(GetOwner());
+	check(OwnerCharacter);
 }
 
 void UABCharacterSkillComponent::ProcessSkill()
@@ -69,14 +70,13 @@ void UABCharacterSkillComponent::SkillBegin()
 {
 	float AttackSpeedRate = SkillData->ComboActionData->AnimationSpeedRate;
 
-	USkeletalMeshComponent* SkeletalMesh = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
-	UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance();
+	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
 
 	CurrentCombo = 1;
 
 	
-	UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
+	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 	
 	//character stop
 	Movement->SetMovementMode(EMovementMode::MOVE_None);
@@ -101,7 +101,7 @@ void UABCharacterSkillComponent::SkillBegin()
 void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	//character move
-	UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
+	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 	Movement->SetMovementMode(EMovementMode::MOVE_Walking);
 
 	ensure(CurrentCombo != 0);
@@ -133,16 +133,16 @@ void UABCharacterSkillComponent::ComboCheck()
 	if (bHasNextComboCommand)
 	{
 		UABComboActionData* ComboActionData = SkillData->ComboActionData;
-		USkeletalMeshComponent* SkeletalMesh = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
-		UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance();
+		UAnimInstance * AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
+
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
 
 		//Play Next Combo Animation
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
 		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
 		SetComboCheckTimer();
-
-		UCharacterMovementComponent* Movement = GetOwner()->GetComponentByClass<UCharacterMovementComponent>();
+		//Skill Redirection
 		SetSkillDirection(Movement->GetLastInputVector());
 
 		bHasNextComboCommand = false;
@@ -151,15 +151,8 @@ void UABCharacterSkillComponent::ComboCheck()
 
 bool UABCharacterSkillComponent::SetSkillDirection( const FVector InDesiredDirection)
 {
-	////during redirectioning, can not set direction.
-	//if (bCanRedirection == false)
-	//{
-	//	return false;
-	//}
-	//start redirectioning
 	ComboDirection = InDesiredDirection;
 	bIsRedirectioning = true;
-	//bCanRedirection = false;
 	return true;
 }
 
@@ -169,7 +162,7 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	//tag :Attack
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, GetOwner());
 
-	UCapsuleComponent* CapsuleComponent = GetOwner()->GetComponentByClass<UCapsuleComponent>();
+	UCapsuleComponent* CapsuleComponent = OwnerCharacter->GetCapsuleComponent();
 
 
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
