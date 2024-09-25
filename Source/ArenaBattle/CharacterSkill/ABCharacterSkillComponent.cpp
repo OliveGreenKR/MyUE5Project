@@ -57,7 +57,7 @@ void UABCharacterSkillComponent::BeginPlay()
 void UABCharacterSkillComponent::ProcessSkill()
 {
 	//First
-	if (!IsCombo())
+	if (!IsCombo() && !OwnerCharacter->GetCharacterMovement()->IsFalling())
 	{
 		SkillBegin();
 		return;
@@ -80,6 +80,7 @@ void UABCharacterSkillComponent::SkillBegin()
 	
 	//character stop
 	Movement->SetMovementMode(EMovementMode::MOVE_None);
+	Movement->Jump
 
 	//Set deffault ComboDireciton 
 	SetSkillDirection(Movement->GetLastInputVector());
