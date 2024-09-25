@@ -50,11 +50,15 @@ protected:
 #pragma endregion
 
 #pragma region Dead
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> DeadMontage;
 
 	virtual void SetDead();
 	void PlayDeadAnimation();
+
+protected:
+	float DeadEventDelayTime = 5.0f;
 #pragma endregion
 
 };
