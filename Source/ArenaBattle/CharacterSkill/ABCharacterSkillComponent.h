@@ -7,7 +7,7 @@
 #include "Interface/ABAnimationAttackInterface.h"
 #include "ABCharacterSkillComponent.generated.h"
 
-DECLARE_DELEGATE(FCharacterSkillComponentOnSkillEndSignature);
+DECLARE_DELEGATE(FOnCharacterSkillEndDelegate);
 
 UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENABATTLE_API UABCharacterSkillComponent : public UActorComponent, public IABAnimationAttackInterface
@@ -30,7 +30,7 @@ public:
 
 public:
 
-	FCharacterSkillComponentOnSkillEndSignature OnSkillEnd;
+	FOnCharacterSkillEndDelegate OnSkillEnd;
 
 protected:
 

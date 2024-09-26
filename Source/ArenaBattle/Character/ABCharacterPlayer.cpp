@@ -191,9 +191,9 @@ void AABCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 
 void AABCharacterPlayer::Attack()
 {
-	if (BasicSkillComponent)
+	if (BasicSkill)
 	{
-		BasicSkillComponent->ProcessSkill();
+		BasicSkill->ProcessSkill();
 	}
 }
 

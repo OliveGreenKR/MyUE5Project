@@ -11,6 +11,8 @@
 #include "ABComboActionData.h"
 #include "Physics/ABCollision.h"
 #include "Engine/DamageEvents.h"
+#include "Components/WidgetComponent.h"
+#include "CharacterStat/ABCharacterStatComponent.h"
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -68,8 +70,23 @@ AABCharacterBase::AABCharacterBase()
 	}
 
 
-	//SKill Component
-	BasicSkillComponent = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkillComponent"));
+	//Components
+	BasicSkill = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
+	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
+
+	HpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	float LocationZ = GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f;
+	HpBar->SetRelativeLocation(FVector(0, 0, 180.0f));
+	UE_LOG(LogTemp, Log, TEXT("hp height set :  %.3f"), LocationZ);
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* InCharacterControlData)
@@ -110,9 +127,9 @@ void AABCharacterBase::Tick(float DeltaTime)
 			1.0f    // Thickness of the lines
 		);
 
-		if (BasicSkillComponent)
+		if (BasicSkill)
 		{
-			BasicSkillComponent->SetDrawDebug(true);
+			BasicSkill->SetDrawDebug(true);
 		}
 
 	}
@@ -123,6 +140,9 @@ void AABCharacterBase::Tick(float DeltaTime)
 void AABCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//after Mesh loading
+	HpBar->SetRelativeLocation(FVector(0, 0, GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f));
 }
 
 float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
