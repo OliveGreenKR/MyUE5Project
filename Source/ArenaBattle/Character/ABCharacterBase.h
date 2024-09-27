@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/ABCharacterWidgetInterface.h"
 #include "ABCharacterBase.generated.h"
 
 UENUM()
@@ -15,13 +16,15 @@ enum class ECharacterControlType : uint8
 };
 
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter
+class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	AABCharacterBase();
+
+	virtual void PostInitializeComponents() override;
 
 protected:
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData);
@@ -42,11 +45,14 @@ protected:
 
 #pragma region Stat Component
 protected:
+	
+	void SetupCharacterWidget(UABUserWidget* InUserWidget) override;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<class UABCharacterStatComponent> Stat;
 #pragma endregion
 
 #pragma region UI Widget Components
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABWidgetComponent> HpBar;
@@ -72,5 +78,7 @@ protected:
 protected:
 	float DeadEventDelayTime = 5.0f;
 #pragma endregion
+
+
 
 };

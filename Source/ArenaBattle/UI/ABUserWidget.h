@@ -18,9 +18,6 @@ public:
 	FORCEINLINE void SetOwningActor(AActor* NewOwner) { OwningActor = NewOwner; }
 
 protected:
-	virtual void NativeConstruct() override;
-
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Actor")
 	TObjectPtr<AActor> OwningActor;
 };

@@ -13,6 +13,7 @@
 #include "Engine/DamageEvents.h"
 #include "UI/ABWidgetComponent.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "UI/ABHpBarWidget.h"
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -76,9 +77,7 @@ AABCharacterBase::AABCharacterBase()
 
 	HpBar = CreateDefaultSubobject<UABWidgetComponent>(TEXT("Widget"));
 	HpBar->SetupAttachment(GetMesh());
-	float LocationZ = GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f;
 	HpBar->SetRelativeLocation(FVector(0, 0, 180.0f));
-	UE_LOG(LogTemp, Log, TEXT("hp height set :  %.3f"), LocationZ);
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
@@ -87,6 +86,17 @@ AABCharacterBase::AABCharacterBase()
 		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+void AABCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	//Set UI Location
+	HpBar->SetRelativeLocation(FVector(0, 0, GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f));
+
+	//Binding Delegate
+	Stat->OnHpZero.AddUObject(this, &AABCharacterBase::SetDead);
 }
 
 void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* InCharacterControlData)
@@ -140,18 +150,27 @@ void AABCharacterBase::Tick(float DeltaTime)
 void AABCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//Set UI Location
-	HpBar->SetRelativeLocation(FVector(0, 0, GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f));
 	
 }
 
 float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float InTrueDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	SetDead();
+
+	Stat->ApplyDamage(DamageAmount);
 
 	return InTrueDamage;
+}
+
+void AABCharacterBase::SetupCharacterWidget(UABUserWidget* InUserWidget)
+{
+	UABHpBarWidget* HpBarWidget = Cast<UABHpBarWidget>(InUserWidget);
+	if (HpBarWidget)
+	{
+		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
+		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
+		Stat->OnHpChanged.AddUObject(HpBarWidget, &UABHpBarWidget::UpdateHpBar);
+	}
 }
 
 void AABCharacterBase::DrawDebugForwardArrow(float InSeconds, FColor Color)
@@ -176,6 +195,7 @@ void AABCharacterBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);
+	HpBar->SetHiddenInGame(true);
 }
 
 void AABCharacterBase::PlayDeadAnimation()
@@ -184,6 +204,7 @@ void AABCharacterBase::PlayDeadAnimation()
 	//AnimInstance->StopAllMontages(0.02f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
 }
+
 
 
 

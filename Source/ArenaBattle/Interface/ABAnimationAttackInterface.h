@@ -14,7 +14,7 @@ class UABAnimationAttackInterface : public UInterface
 };
 
 /**
- * 
+ * An interface that performs hit detection at the requested time
  */
 class ARENABATTLE_API IABAnimationAttackInterface
 {
