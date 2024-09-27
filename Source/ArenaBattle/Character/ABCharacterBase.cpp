@@ -164,6 +164,7 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void AABCharacterBase::SetupCharacterWidget(UABUserWidget* InUserWidget)
 {
+	//TODO :  BidnMap< WidgetClass, BindFucntion >
 	UABHpBarWidget* HpBarWidget = Cast<UABHpBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
@@ -201,7 +202,6 @@ void AABCharacterBase::SetDead()
 void AABCharacterBase::PlayDeadAnimation()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	//AnimInstance->StopAllMontages(0.02f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
 }
 
