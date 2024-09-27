@@ -49,7 +49,7 @@ protected:
 #pragma region UI Widget Components
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UWidgetComponent> HpBar;
+	TObjectPtr<class UABWidgetComponent> HpBar;
 #pragma endregion
 
 #pragma region Debug

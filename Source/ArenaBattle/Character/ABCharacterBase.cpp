@@ -11,7 +11,7 @@
 #include "ABComboActionData.h"
 #include "Physics/ABCollision.h"
 #include "Engine/DamageEvents.h"
-#include "Components/WidgetComponent.h"
+#include "UI/ABWidgetComponent.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
 
 // Sets default values
@@ -74,7 +74,7 @@ AABCharacterBase::AABCharacterBase()
 	BasicSkill = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
 	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
 
-	HpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+	HpBar = CreateDefaultSubobject<UABWidgetComponent>(TEXT("Widget"));
 	HpBar->SetupAttachment(GetMesh());
 	float LocationZ = GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f;
 	HpBar->SetRelativeLocation(FVector(0, 0, 180.0f));
@@ -141,8 +141,9 @@ void AABCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//after Mesh loading
+	//Set UI Location
 	HpBar->SetRelativeLocation(FVector(0, 0, GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f));
+	
 }
 
 float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

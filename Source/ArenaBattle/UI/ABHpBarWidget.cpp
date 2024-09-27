@@ -15,6 +15,8 @@ void UABHpBarWidget::NativeConstruct()
 
 	HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(HpBarName));
 	ensure(HpProgressBar);
+
+	//Data Binding to OwningActor
 }
 
 void UABHpBarWidget::UpdateHpBar(float NewCurrentHp)
