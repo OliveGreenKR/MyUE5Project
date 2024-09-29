@@ -49,6 +49,11 @@ SourceArt/**/*.tga
 Binaries/*
 Plugins/**/Binaries/*
 
+# External uasset
+Content/*
+!Content/ArenaBattle/*
+
+
 # Builds
 Build/*
 

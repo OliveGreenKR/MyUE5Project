@@ -46,9 +46,10 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 }
 
-void UABCharacterSkillComponent::BeginPlay()
+
+void UABCharacterSkillComponent::OnRegister()
 {
-	Super::BeginPlay();
+	Super::OnRegister();
 
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	check(OwnerCharacter);
