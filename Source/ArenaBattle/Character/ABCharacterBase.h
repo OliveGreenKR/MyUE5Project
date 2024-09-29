@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/ABCharacterWidgetInterface.h"
+#include "Interface/ABCharacterItemInterface.h"
 #include "ABCharacterBase.generated.h"
+
+enum class EItemType : uint8;
 
 UENUM()
 enum class ECharacterControlType : uint8
@@ -15,8 +18,20 @@ enum class ECharacterControlType : uint8
 	Quater,
 };
 
+DECLARE_LOG_CATEGORY_EXTERN(LogABCharacter, Log, All);
+
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UABItemData* /*InItemData*/);
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
+{
+	GENERATED_BODY()
+	FTakeItemDelegateWrapper() {}
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
+	FOnTakeItemDelegate ItemDelegate;
+};
+
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface
+class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface, public IABCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -28,10 +43,11 @@ public:
 
 protected:
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData);
+	
 	virtual void Tick(float DeltaTime) override;
-	virtual void BeginPlay() override;
+	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
@@ -45,15 +61,15 @@ protected:
 
 #pragma region Stat Component
 protected:
-	
-	void SetupCharacterWidget(UABUserWidget* InUserWidget) override;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<class UABCharacterStatComponent> Stat;
 #pragma endregion
 
 #pragma region UI Widget Components
-
 protected:
+	//Inherited IABCharacterWidgetInterface
+	void SetupCharacterWidget(UABUserWidget* InUserWidget) override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABWidgetComponent> HpBar;
 #pragma endregion
@@ -79,6 +95,19 @@ protected:
 	float DeadEventDelayTime = 5.0f;
 #pragma endregion
 
+#pragma region Item
+protected:
+	// Inherited via IABCharacterItemInterface
+	virtual void TakeItem(UABItemData* InItemData) override;
+
+	virtual void EquipWeapon(class UABItemData* InItemData);
+	virtual void DrinkPotion(class UABItemData* InItemData);
+	virtual void ReadScroll(class UABItemData* InItemData);
+
+protected:
+	UPROPERTY()
+	TMap<EItemType,FTakeItemDelegateWrapper> TakeItemActions;
+#pragma endregion
 
 
 };

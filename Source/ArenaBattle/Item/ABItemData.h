@@ -16,7 +16,7 @@ enum class EItemType : uint8
 };
 
 /**
- * 
+ * ItemData Asset
  */
 UCLASS()
 class ARENABATTLE_API UABItemData : public UPrimaryDataAsset
