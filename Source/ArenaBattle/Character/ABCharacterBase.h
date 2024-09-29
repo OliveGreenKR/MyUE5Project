@@ -105,9 +105,15 @@ protected:
 	virtual void ReadScroll(class UABItemData* InItemData);
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Weapon;
+
 	UPROPERTY()
 	TMap<EItemType,FTakeItemDelegateWrapper> TakeItemActions;
+
+
 #pragma endregion
+
 
 
 };

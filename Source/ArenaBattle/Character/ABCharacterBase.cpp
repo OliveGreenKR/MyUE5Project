@@ -95,6 +95,10 @@ AABCharacterBase::AABCharacterBase()
 	TakeItemActions.Add(EItemType::Weapon, FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::EquipWeapon)));
 	TakeItemActions.Add(EItemType::Potion, FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::DrinkPotion)));
 	TakeItemActions.Add(EItemType::Scroll, FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::ReadScroll)));
+
+	//Equipment
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
 void AABCharacterBase::PostInitializeComponents()
@@ -223,7 +227,16 @@ void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
 
 void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 {
-	UE_LOG(LogABCharacter, Log, TEXT("Equip Weapon"));
+	UABWeaponItemData* WeaponItemData = Cast<UABWeaponItemData>(InItemData);
+	if (WeaponItemData)
+	{
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+	}
 }
 
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
