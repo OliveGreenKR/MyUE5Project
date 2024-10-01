@@ -1,10 +1,10 @@
 #include "Character/ABCharacterNonPlayer.h"
 
-ABCharacterNonPlayer::ABCharacterNonPlayer()
+AABCharacterNonPlayer::AABCharacterNonPlayer()
 {
 }
 
-void ABCharacterNonPlayer::SetDead()
+void AABCharacterNonPlayer::SetDead()
 {
 	Super::SetDead();
 	

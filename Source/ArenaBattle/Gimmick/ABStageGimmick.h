@@ -6,6 +6,25 @@
 #include "GameFramework/Actor.h"
 #include "ABStageGimmick.generated.h"
 
+DECLARE_DELEGATE(FOnStageChangedDelegate);
+USTRUCT(BlueprintType)
+struct FStageChangedDelegateWrapper
+{
+	GENERATED_BODY()
+	FStageChangedDelegateWrapper() { }
+	FStageChangedDelegateWrapper(const FOnStageChangedDelegate& InDelegate) : StageDelegate(InDelegate) {}
+	FOnStageChangedDelegate StageDelegate;
+};
+
+UENUM(BlueprintType)
+enum class EStageState : uint8
+{
+	READY = 0,
+	FIGHT,
+	REWARD,
+	NEXT
+};
+
 UCLASS()
 class ARENABATTLE_API AABStageGimmick : public AActor
 {
@@ -14,6 +33,10 @@ class ARENABATTLE_API AABStageGimmick : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AABStageGimmick();
+
+protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void Tick(float DeltaTime) override;
 
 	// Stage Section
 protected:
@@ -39,36 +62,43 @@ protected:
 
 	void OpenAllGates();
 	void CloseAllGates();
+	
+private:
+	FRotator DesiredDoorRotation;
+	bool bIsDoorRotating : 1;
 
-//	// State Section
-//protected:
-//	UPROPERTY(EditAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
-//	EStageState CurrentState;
-//
-//	void SetState(EStageState InNewState);
-//
-//	UPROPERTY()
-//	TMap<EStageState, FStageChangedDelegateWrapper> StateChangeActions;
-//
-//	void SetReady();
-//	void SetFight();
-//	void SetChooseReward();
-//	void SetChooseNext();
-//
-//	// Fight Section
-//protected:
-//	UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
-//	TSubclassOf<class AABCharacterNonPlayer> OpponentClass;
-//
-//	UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
-//	float OpponentSpawnTime;
-//
-//	UFUNCTION()
-//	void OnOpponentDestroyed(AActor* DestroyedActor);
-//
-//	FTimerHandle OpponentTimerHandle;
-//	void OnOpponentSpawn();
-//
+
+	// State Section
+protected:
+	void SetState(const EStageState InNewState);
+
+private:
+	UPROPERTY(EditAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
+	EStageState CurrentState = EStageState::READY;
+
+
+	UPROPERTY()
+	TMap<EStageState, FStageChangedDelegateWrapper> StateChangeActions;
+
+	void SetReady();
+	void SetFight();
+	void SetChooseReward();
+	void SetChooseNext();
+
+	// Fight Section
+protected:
+	UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AABCharacterNonPlayer> OpponentClass;
+
+	UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
+	float OpponentSpawnTime;
+
+	UFUNCTION()
+	void OnOpponentDestroyed(AActor* DestroyedActor);
+
+	FTimerHandle OpponentTimerHandle;
+	void OnOpponentSpawn();
+
 //	// Reward Section
 //protected:
 //	UPROPERTY(VisibleAnywhere, Category = Reward, Meta = (AllowPrivateAccess = "true"))
