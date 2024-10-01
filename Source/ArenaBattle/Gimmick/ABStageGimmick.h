@@ -65,6 +65,7 @@ protected:
 	
 private:
 	FRotator DesiredDoorRotation;
+	float DesiredDoorLocationZ = -340.0f;
 	bool bIsDoorRotating : 1;
 
 
@@ -74,7 +75,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
-	EStageState CurrentState = EStageState::READY;
+	EStageState CurrentState = EStageState::NEXT;
 
 
 	UPROPERTY()

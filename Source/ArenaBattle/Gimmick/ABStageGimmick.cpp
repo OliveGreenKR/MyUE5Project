@@ -33,7 +33,7 @@ AABStageGimmick::AABStageGimmick()
 	StageTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
 	StageTrigger->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnStageTriggerBeginOverlap);
 	StageTrigger->SetMobility(EComponentMobility::Static);
-	Stage->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); // Set collision channel to WorldStatic
+	StageTrigger->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); // Set collision channel to WorldStatic
 
 	// Gate Section
 	static FName GateSockets[] = { TEXT("+XGate"), TEXT("-XGate"), TEXT("+YGate"), TEXT("-YGate") };
@@ -43,8 +43,8 @@ AABStageGimmick::AABStageGimmick()
 		UStaticMeshComponent* Gate = CreateDefaultSubobject<UStaticMeshComponent>(GateSocket);
 		Gate->SetStaticMesh(GateMeshRef.Object);
 		Gate->SetupAttachment(Stage, GateSocket);
-		Gate->SetRelativeLocation(FVector(0.0f, -80.5f, 0.0f));
-		Gate->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+		Gate->SetRelativeLocation(FVector(0.0f, -80.5f, -340.0f));
+		Gate->SetRelativeRotation(FRotator::ZeroRotator);
 		Gates.Add(GateSocket, Gate);
 
 		FName TriggerName = *GateSocket.ToString().Append(TEXT("Trigger"));
@@ -83,7 +83,7 @@ void AABStageGimmick::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	SetState(CurrentState);
+ 	SetState(CurrentState);
 }
 
 void AABStageGimmick::Tick(float DeltaTime)
@@ -93,12 +93,15 @@ void AABStageGimmick::Tick(float DeltaTime)
 	{
 		for (auto& Gate : Gates)
 		{
-			FRotator CurrentRotation = (Gate.Value)->GetRelativeRotation();
-			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredDoorRotation, DeltaTime, 10.0f);
+			FVector CurrentLocation = (Gate.Value)->GetRelativeLocation();
+			FVector DesiredLocation = CurrentLocation;
+			DesiredLocation.SetComponentForAxis(EAxis::Z, DesiredDoorLocationZ);
 
-			if (!NewRotation.Equals(CurrentRotation, SCENECOMPONENT_ROTATOR_TOLERANCE))
+			FVector NewLocation = FMath::VInterpTo(CurrentLocation, DesiredLocation, DeltaTime, 10.0f);
+
+			if (!NewLocation.Equals(CurrentLocation, SCENECOMPONENT_ROTATOR_TOLERANCE))
 			{
-				(Gate.Value)->SetRelativeRotation(NewRotation);
+				(Gate.Value)->SetRelativeLocation(NewLocation);
 			}
 			else
 			{
@@ -139,13 +142,13 @@ void AABStageGimmick::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 
 	if (!bResult)
 	{
-		GetWorld()->SpawnActor<AABStageGimmick>(NewLocation, FRotator::ZeroRotator);
+		GetWorld()->SpawnActor<AABStageGimmick>(NewLocation, FRotator::ZeroRotator)->SetState(EStageState::READY);
 	}
 }
 
 void AABStageGimmick::OpenAllGates()
 {
-	DesiredDoorRotation = FRotator(0, -90.0f, 0);
+	DesiredDoorLocationZ = -340.0f;
 	bIsDoorRotating = true;
 	//for (auto& Gate : Gates)
 	//{
@@ -155,7 +158,7 @@ void AABStageGimmick::OpenAllGates()
 
 void AABStageGimmick::CloseAllGates()
 {
-	DesiredDoorRotation = FRotator::ZeroRotator;
+	DesiredDoorLocationZ = 0.0f;
 	bIsDoorRotating = true;
 	//for (auto& Gate : Gates)
 	//{
@@ -167,7 +170,7 @@ void AABStageGimmick::CloseAllGates()
 void AABStageGimmick::SetState(const EStageState InNewState)
 {
 	CurrentState = InNewState;
-
+	UE_LOG(LogTemp, Log, TEXT("Stage Stage Change %d"), (uint8)CurrentState);
 	if (StateChangeActions.Contains(InNewState))
 	{
 		StateChangeActions[CurrentState].StageDelegate.ExecuteIfBound();
