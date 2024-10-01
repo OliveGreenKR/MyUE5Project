@@ -23,6 +23,7 @@ AABStageGimmick::AABStageGimmick()
 	{
 		Stage->SetStaticMesh(StageMeshRef.Object);
 		Stage->SetMobility(EComponentMobility::Static);
+		Stage->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); // Set collision channel to WorldStatic
 	}
 
 	StageTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("StageTrigger"));
@@ -32,6 +33,7 @@ AABStageGimmick::AABStageGimmick()
 	StageTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
 	StageTrigger->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnStageTriggerBeginOverlap);
 	StageTrigger->SetMobility(EComponentMobility::Static);
+	Stage->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic); // Set collision channel to WorldStatic
 
 	// Gate Section
 	static FName GateSockets[] = { TEXT("+XGate"), TEXT("-XGate"), TEXT("+YGate"), TEXT("-YGate") };
