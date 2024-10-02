@@ -92,7 +92,7 @@ protected:
 	void PlayDeadAnimation();
 
 protected:
-	float DeadEventDelayTime = 5.0f;
+	float DeadEventDelayTime = 2.0f;
 #pragma endregion
 
 #pragma region Item

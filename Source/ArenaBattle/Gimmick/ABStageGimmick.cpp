@@ -70,13 +70,13 @@ AABStageGimmick::AABStageGimmick()
 	OpponentSpawnTime = 2.0f;
 	OpponentClass = AABCharacterNonPlayer::StaticClass();
 
-	//// Reward Section
-	//RewardBoxClass = AABItemBox::StaticClass();
-	//for (FName GateSocket : GateSockets)
-	//{
-	//	FVector BoxLocation = Stage->GetSocketLocation(GateSocket) / 2;
-	//	RewardBoxLocations.Add(GateSocket, BoxLocation);
-	//}
+	// Reward Section
+	RewardBoxClass = AABItemBox::StaticClass();
+	for (FName GateSocket : GateSockets)
+	{
+		FVector BoxLocation = Stage->GetSocketLocation(GateSocket) / 2;
+		RewardBoxLocations.Add(GateSocket, BoxLocation);
+	}
 }
 
 void AABStageGimmick::OnConstruction(const FTransform& Transform)
@@ -150,20 +150,12 @@ void AABStageGimmick::OpenAllGates()
 {
 	DesiredDoorLocationZ = -340.0f;
 	bIsDoorRotating = true;
-	//for (auto& Gate : Gates)
-	//{
-	//	(Gate.Value)->SetRelativeRotation(FRotator(0, -90.0f, 0));
-	//}
 }
 
 void AABStageGimmick::CloseAllGates()
 {
 	DesiredDoorLocationZ = 0.0f;
 	bIsDoorRotating = true;
-	//for (auto& Gate : Gates)
-	//{
-	//	(Gate.Value)->SetRelativeRotation(FRotator::ZeroRotator);
-	//}
 }
 
 
@@ -210,7 +202,7 @@ void AABStageGimmick::SetChooseReward()
 	}
 
 	CloseAllGates();
-	//SpawnRewardBoxes();
+	SpawnRewardBoxes();
 }
 
 void AABStageGimmick::SetChooseNext()
@@ -237,6 +229,40 @@ void AABStageGimmick::OnOpponentSpawn()
 	if (ABOpponentCharacter)
 	{
 		ABOpponentCharacter->OnDestroyed.AddDynamic(this, &AABStageGimmick::OnOpponentDestroyed);
+	}
+}
+
+void AABStageGimmick::OnRewardTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	for (const auto& RewardBox : RewardBoxes)
+	{
+		if (RewardBox.IsValid())
+		{
+			AABItemBox* ValidItemBox = RewardBox.Get();
+			AActor* OverlappedBox = OverlappedComponent->GetOwner();
+			if (OverlappedBox != ValidItemBox)
+			{
+				ValidItemBox->Destroy();
+			}
+		}
+	}
+
+	SetState(EStageState::NEXT);
+}
+
+void AABStageGimmick::SpawnRewardBoxes()
+{
+	for (const auto& RewardBoxLocation : RewardBoxLocations)
+	{
+		FVector WorldSpawnLocation = GetActorLocation() + RewardBoxLocation.Value + FVector(0.0f, 0.0f, 30.0f);
+		AActor* ItemActor = GetWorld()->SpawnActor(RewardBoxClass, &WorldSpawnLocation, &FRotator::ZeroRotator);
+		AABItemBox* RewardBoxActor = Cast<AABItemBox>(ItemActor);
+		if (RewardBoxActor)
+		{
+			RewardBoxActor->Tags.Add(RewardBoxLocation.Key);
+			RewardBoxActor->GetTrigger()->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnRewardTriggerBeginOverlap);
+			RewardBoxes.Add(RewardBoxActor);
+		}
 	}
 }
 
