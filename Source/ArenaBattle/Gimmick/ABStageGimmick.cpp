@@ -162,7 +162,6 @@ void AABStageGimmick::CloseAllGates()
 void AABStageGimmick::SetState(const EStageState InNewState)
 {
 	CurrentState = InNewState;
-	UE_LOG(LogTemp, Log, TEXT("Stage Stage Change %d"), (uint8)CurrentState);
 	if (StateChangeActions.Contains(InNewState))
 	{
 		StateChangeActions[CurrentState].StageDelegate.ExecuteIfBound();

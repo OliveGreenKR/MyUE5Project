@@ -36,7 +36,6 @@ void UABHpBarWidget::UpdateHpBar(float NewCurrentHp)
 	float NewHpPercent = FMath::Clamp(NewCurrentHp / MaxHp, 0.0f, 1.0f);
 
 	HpProgressBar->SetPercent(NewHpPercent);
-	UE_LOG(LogTemp, Log, TEXT("hp : %.3f"), NewHpPercent * 100.0f);
 }
 
 
