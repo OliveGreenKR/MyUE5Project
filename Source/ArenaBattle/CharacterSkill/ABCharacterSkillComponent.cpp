@@ -152,7 +152,11 @@ void UABCharacterSkillComponent::ComboCheck()
 
 bool UABCharacterSkillComponent::SetSkillDirection( const FVector InDesiredDirection)
 {
-	ComboDirection = InDesiredDirection;
+	ComboDirection = (InDesiredDirection == FVector::ZeroVector) 
+		? GetOwner()->GetActorForwardVector() 
+		: InDesiredDirection;
+
+	UE_LOG(LogTemp, Log, TEXT("ComboDirection : %s"), *InDesiredDirection.ToString());
 	bIsRedirectioning = true;
 	return true;
 }
