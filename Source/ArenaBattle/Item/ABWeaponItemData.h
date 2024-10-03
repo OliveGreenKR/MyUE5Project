@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/ABItemData.h"
+#include "GameData/ABCharacterStat.h"
 #include "ABWeaponItemData.generated.h"
 
 /**
@@ -21,4 +22,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	FABCharacterStat ModifierStat;
 };

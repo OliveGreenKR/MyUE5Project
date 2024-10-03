@@ -169,13 +169,23 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return InTrueDamage;
 }
 
+const int32 AABCharacterBase::GetLevel()
+{
+	return Stat->GetCurrentLevel();
+}
+
+void AABCharacterBase::SetLevel(int32 InNewLevel)
+{
+	Stat->SetLevelStat(InNewLevel);
+}
+
 void AABCharacterBase::SetupCharacterWidget(UABUserWidget* InUserWidget)
 {
 	//TODO :  BidnMap< WidgetClass, BindFucntion >
 	UABHpBarWidget* HpBarWidget = Cast<UABHpBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
+		HpBarWidget->SetMaxHp(Stat->GetTotalStat().MaxHp);
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		Stat->OnHpChanged.AddUObject(HpBarWidget, &UABHpBarWidget::UpdateHpBar);
 	}
@@ -236,6 +246,7 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 		}
 
 		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+		Stat->SetModifierStat(WeaponItemData->ModifierStat);
 	}
 }
 

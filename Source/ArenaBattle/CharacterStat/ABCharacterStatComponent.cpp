@@ -2,12 +2,19 @@
 
 
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "GameData/ABGameSingleton.h"
 
 // Sets default values for this component's properties
 UABCharacterStatComponent::UABCharacterStatComponent()
 {
-	MaxHp = 200.0f;
-	SetCurrentHp(MaxHp);
+	CurrentLevel = 1;
+}
+
+void UABCharacterStatComponent::SetLevelStat(int32 InNewLevel)
+{
+	CurrentLevel = FMath::Clamp(InNewLevel, 1, UABGameSingleton::Get().CharacterMaxLevel);
+	BaseStat = UABGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	check(BaseStat.MaxHp > 0)
 }
 
 
@@ -30,7 +37,7 @@ float UABCharacterStatComponent::ApplyDamage(float InDamage)
 
 void UABCharacterStatComponent::SetCurrentHp(float NewHp)
 {
-	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, MaxHp);
+	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, GetTotalStat().MaxHp);
 	OnHpChanged.Broadcast(CurrentHp);
 }
 
@@ -39,6 +46,8 @@ void UABCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHp = MaxHp;
+	SetLevelStat(CurrentLevel);
+	SetCurrentHp(GetTotalStat().MaxHp);
+
 }
 

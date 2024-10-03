@@ -25,8 +25,9 @@ public:
 public:
 	FORCEINLINE FABCharacterStat GetCharacterStat(int32 InLevel) const 
 	{ 
-		return CharacterStatTable.IsValidIndex(InLevel) 
-			? CharacterStatTable[InLevel] 
+		int32 LevelIndex = InLevel - 1;
+		return CharacterStatTable.IsValidIndex(LevelIndex)
+			? CharacterStatTable[LevelIndex]
 			: FABCharacterStat();
 	}
 	

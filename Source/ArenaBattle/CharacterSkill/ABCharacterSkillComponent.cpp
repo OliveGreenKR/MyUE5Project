@@ -2,7 +2,8 @@
 
 
 #include "CharacterSkill/ABCharacterSkillComponent.h"
-#include "GameFramework/Character.h"
+#include "Character/ABCharacterBase.h"
+#include "CharacterStat/ABCharacterStatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
@@ -51,7 +52,7 @@ void UABCharacterSkillComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	OwnerCharacter = Cast<ACharacter>(GetOwner());
+	OwnerCharacter = Cast<AABCharacterBase>(GetOwner());
 	check(OwnerCharacter);
 }
 
@@ -69,7 +70,9 @@ void UABCharacterSkillComponent::ProcessSkill()
 
 void UABCharacterSkillComponent::SkillBegin()
 {
-	float AttackSpeedRate = SkillData->ComboActionData->AnimationSpeedRate;
+	float AttackSpeedRate =
+		SkillData->ComboActionData->AnimationSpeedRate *
+		OwnerCharacter->GetStat()->GetTotalStat().AttackSpeed;
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
@@ -172,7 +175,8 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
 	const FVector Start = GetOwner()->GetActorLocation() + ComboDirection * CapsuleComponent->GetScaledCapsuleRadius();
-	const FVector End = Start + ComboDirection * SkillData->SkillExtent.X;
+	const FVector End = Start + 
+			ComboDirection * SkillData->SkillExtent.X;
 
 	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, SkillData->GetCollisionShape(), Params);
 	if (HitDetected)

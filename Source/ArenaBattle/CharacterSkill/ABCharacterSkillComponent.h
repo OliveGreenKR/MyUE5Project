@@ -25,7 +25,7 @@ public:
 	void ProcessSkill();
 	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
 
-	//inherited Interface
+	//IABAnimationAttackInterface 
 	virtual void PerformSkillHitCheck();
 
 public:
@@ -57,7 +57,7 @@ private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
 
 private:
-	TObjectPtr<class ACharacter> OwnerCharacter = nullptr;
+	TObjectPtr<class AABCharacterBase> OwnerCharacter = nullptr;
 
 	//When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
