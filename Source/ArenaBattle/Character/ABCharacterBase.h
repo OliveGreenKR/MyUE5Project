@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Interface/ABCharacterWidgetInterface.h"
 #include "Interface/ABCharacterItemInterface.h"
+#include "Interface/ABCharacterRedirectionInterface.h"
 #include "ABCharacterBase.generated.h"
 
 enum class EItemType : uint8;
@@ -19,8 +20,8 @@ enum class ECharacterControlType : uint8
 };
 
 DECLARE_LOG_CATEGORY_EXTERN(LogABCharacter, Log, All);
-
 DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UABItemData* /*InItemData*/);
+
 USTRUCT(BlueprintType)
 struct FTakeItemDelegateWrapper
 {
@@ -31,7 +32,7 @@ struct FTakeItemDelegateWrapper
 };
 
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface, public IABCharacterItemInterface
+class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface, public IABCharacterItemInterface, public IABCharacterRedirectionInterface
 {
 	GENERATED_BODY()
 
@@ -52,9 +53,21 @@ protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
 
+#pragma region CharacterRedirection
+private:
+	// Inherited via IABCharacterRedirection
+	void CharacterRedireciton(const FVector& InDirection, const ERedirectionPrioirty prioirty) override;
+
+	FVector DesiredDirection;
+	ERedirectionPrioirty LastPriority = ERedirectionPrioirty::None;
+	bool bIsRedirectioning : 1 = false;
+
+#pragma endregion
 
 #pragma region Skill Components
 protected:
+	void ProcessSkill(const TObjectPtr<class UABCharacterSkillComponent> InSkill) const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABCharacterSkillComponent> BasicSkill;
 #pragma endregion
@@ -118,7 +131,5 @@ protected:
 
 
 #pragma endregion
-
-
 
 };

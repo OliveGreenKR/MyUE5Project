@@ -158,6 +158,23 @@ void AABCharacterBase::Tick(float DeltaTime)
 	}
 #pragma endregion
 	
+#pragma region Redirection
+
+	if (bIsRedirectioning)
+	{
+		FRotator CurrentRotation = GetOwner()->GetActorRotation();
+		FRotator DesiredRotation = DesiredDirection.Rotation();
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f);
+		GetOwner()->SetActorRotation(NewRotation);
+
+		//end rotate
+		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
+		{
+			bIsRedirectioning = false;
+			GetOwner()->SetActorRotation(DesiredRotation);
+		}
+	}
+#pragma endregion
 }
 
 float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -167,6 +184,11 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	Stat->ApplyDamage(DamageAmount);
 
 	return InTrueDamage;
+}
+
+void AABCharacterBase::ProcessSkill(const TObjectPtr<class UABCharacterSkillComponent> InSkill) const
+{
+	//request skill to Skill Comoponent.
 }
 
 const int32 AABCharacterBase::GetLevel()
@@ -253,6 +275,17 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
 {
 	UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
+}
+
+void AABCharacterBase::CharacterRedireciton(const FVector& InDirection, const ERedirectionPrioirty prioirty)
+{
+	//higher prioirity
+	if (static_cast<uint8>(prioirty) < static_cast<uint8>(LastPriority))
+	{
+		DesiredDirection = InDirection;
+		LastPriority = prioirty;
+		bIsRedirectioning = true;
+	}
 }
 
 

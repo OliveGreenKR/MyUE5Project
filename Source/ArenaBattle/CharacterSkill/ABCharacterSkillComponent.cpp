@@ -4,6 +4,8 @@
 #include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "Character/ABCharacterBase.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "Interface/ABCharacterRedirectionInterface.h"
+#include "Character/ABCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
@@ -48,13 +50,10 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 }
 
 
-void UABCharacterSkillComponent::OnRegister()
-{
-	Super::OnRegister();
-
-	OwnerCharacter = Cast<AABCharacterBase>(GetOwner());
-	check(OwnerCharacter);
-}
+//void UABCharacterSkillComponent::OnRegister()
+//{
+//	Super::OnRegister();
+//}
 
 void UABCharacterSkillComponent::ProcessSkill()
 {

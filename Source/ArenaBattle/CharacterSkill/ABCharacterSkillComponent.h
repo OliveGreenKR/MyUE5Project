@@ -20,7 +20,7 @@ public:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void OnRegister() override;
+	//virtual void OnRegister() override;
 
 	void ProcessSkill();
 	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
@@ -57,10 +57,10 @@ private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
 
 private:
-	TObjectPtr<class AABCharacterBase> OwnerCharacter = nullptr;
-
 	//When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
 	bool bIsRedirectioning = false;
 	bool bDrawDebug = false;
+
+	TObjectPtr<class AABCharacterBase> OwnerCharacter;
 };
