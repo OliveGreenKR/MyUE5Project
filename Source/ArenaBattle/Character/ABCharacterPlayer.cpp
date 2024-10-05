@@ -192,11 +192,10 @@ void AABCharacterPlayer::Attack()
 {
 	if (BasicSkillComponent)
 	{
-		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
+		using SkillParameters = UABCharacterSkillComponent::SkillParameters;
 		SkillParameters SkillParams = SkillParameters();
 
-
-		BasicSkillComponent->ExecuteSkill(SkillParams);
+		BasicSkillComponent->ProcessSkill(SkillParams, bDrawDebug);
 	}
 }
 

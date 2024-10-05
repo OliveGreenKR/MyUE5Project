@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interface/ABAnimationAttackInterface.h"
-#include "Interface/ABSkillExecutorInterface.h"
 #include "ABCharacterSkillComponent.generated.h"
 
 DECLARE_DELEGATE(FOnCharacterSkillEndDelegate);
@@ -13,22 +12,30 @@ DECLARE_DELEGATE(FOnCharacterSkillBeginDelegate);
 
 UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENABATTLE_API UABCharacterSkillComponent : public UActorComponent, 
-	public IABAnimationAttackInterface, public IABSkillExecutorInterface
+	public IABAnimationAttackInterface
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
+	struct SkillParameters
+	{
+		float SkillSpeedRate = 1.0f;
+		FVector3f SkillExtentRate = FVector3f::OneVector;
+		float SkillDamageModifier = 0.0f;
+		float SkillDamageMultiplier = 1.0f;
+	};
+
 	UABCharacterSkillComponent();
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void OnRegister() override;
 
+	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
+	
 	//IABAnimationAttackInterface 
 	virtual void PerformSkillHitCheck();
-
-	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
 public:
 
 	FOnCharacterSkillEndDelegate OnSkillEnd;
@@ -57,17 +64,11 @@ private:
 private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
 
-public:
-	// Inherited via IABSkillExecutorInterface
-	void ExecuteSkill(const SkillParameters& InSkillParams) override;
-
 private:
-	void ProcessSkill();
-
 	//When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
-	bool bIsRedirectioning = false;
-	bool bDrawDebug = false;
+	bool bIsRedirectioning : 1 = false;
+	bool bDrawDebug : 1 = false;
 
 	SkillParameters LastSkillParams = SkillParameters();
 	TObjectPtr<class ACharacter> OwnerCharacter;

@@ -149,11 +149,6 @@ void AABCharacterBase::Tick(float DeltaTime)
 			1.0f    // Thickness of the lines
 		);
 
-		if (BasicSkillComponent)
-		{
-			BasicSkillComponent->SetDrawDebug(true);
-		}
-
 	}
 #pragma endregion
 }

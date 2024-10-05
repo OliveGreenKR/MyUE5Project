@@ -51,16 +51,13 @@ void UABCharacterSkillComponent::OnRegister()
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 }
 
-void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillParams)
-{
-	ProcessSkill();
-}
-
-void UABCharacterSkillComponent::ProcessSkill()
+void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug)
 {
 	//First
 	if (!IsCombo() && !OwnerCharacter->GetCharacterMovement()->IsFalling())
 	{
+		LastSkillParams = InSkillParams;
+		bDrawDebug = DrawDebug;
 		SkillBegin();
 		return;
 	}
@@ -110,6 +107,7 @@ void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsPr
 
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
+	bDrawDebug = false;
 	OnSkillEnd.ExecuteIfBound();
 }
 
