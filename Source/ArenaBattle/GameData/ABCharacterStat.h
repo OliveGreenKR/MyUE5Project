@@ -10,7 +10,12 @@ struct FABCharacterStat : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	FABCharacterStat() : MaxHp(0.0f), Attack(0.0f), AttackRange(0.0f), AttackSpeed(0.0f), MovementSpeed(0.0f) {}
+	FABCharacterStat() : 
+		MaxHp(0.0f), 
+		Attack(0.0f), 
+		AttackRangeX(0.0f), AttackRangeY(0.0f), AttackRangeZ(0.0f), 
+		AttackSpeed(0.0f), 
+		MovementSpeed(0.0f) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MaxHp;
@@ -19,7 +24,13 @@ public:
 	float Attack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float AttackRange;
+	float AttackRangeX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float AttackRangeY;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float AttackRangeZ;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float AttackSpeed;

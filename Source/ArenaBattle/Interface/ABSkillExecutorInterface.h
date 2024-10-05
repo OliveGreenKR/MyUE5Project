@@ -22,4 +22,14 @@ class ARENABATTLE_API IABSkillExecutorInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
+	struct SkillParameters
+	{
+		float SkillSpeedRate = 1.0f;
+		FVector3f SkillExtentRate = FVector3f::OneVector;
+		float SkillDamageModifier = 0.0f;
+		float SkillDamageMultiplier= 1.0f;
+	};
+
+	virtual void ExecuteSkill(const SkillParameters& InSkillParams) = 0;
 };

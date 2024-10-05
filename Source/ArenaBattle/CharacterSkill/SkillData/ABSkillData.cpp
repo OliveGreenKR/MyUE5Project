@@ -7,25 +7,26 @@ UABSkillData::UABSkillData()
 {
 }
 
-const FCollisionShape UABSkillData::GetCollisionShape() const
+const FCollisionShape UABSkillData::GetCollisionShape(const FVector3f& ExtentMultiplier) const
 {
 	FCollisionShape CollisionShape;
+	FVector3f NewExtent = SkillExtent * ExtentMultiplier;
 
 	switch (CollisionShapeType)
 	{
 		case ESkillCollisionShape::Box:
 		{
-			CollisionShape.SetBox(SkillExtent);
+			CollisionShape.SetBox(NewExtent);
 			break;
 		}
 		case ESkillCollisionShape::Capsule:
 		{
-			CollisionShape.SetCapsule(SkillExtent);
+			CollisionShape.SetCapsule(NewExtent);
 			break;
 		}
 		case ESkillCollisionShape::Sphere:
 		{
-			CollisionShape.SetSphere(SkillExtent.GetMax());
+			CollisionShape.SetSphere(NewExtent.GetMax());
 			break;
 		}
 	}

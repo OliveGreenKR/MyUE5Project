@@ -26,7 +26,7 @@ public:
 
 	UABSkillData();
 
-	const struct FCollisionShape GetCollisionShape() const;
+	const struct FCollisionShape GetCollisionShape(const FVector3f& ExtentMultiplier =  FVector3f::OneVector) const;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Name)

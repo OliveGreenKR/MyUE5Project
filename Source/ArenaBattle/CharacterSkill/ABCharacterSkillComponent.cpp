@@ -22,7 +22,6 @@ UABCharacterSkillComponent::UABCharacterSkillComponent()
 	{
 		SkillData = SkillDataRef.Object;
 	}
-
 }
 
 void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -52,6 +51,11 @@ void UABCharacterSkillComponent::OnRegister()
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 }
 
+void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillParams)
+{
+	ProcessSkill();
+}
+
 void UABCharacterSkillComponent::ProcessSkill()
 {
 	//First
@@ -67,7 +71,8 @@ void UABCharacterSkillComponent::ProcessSkill()
 void UABCharacterSkillComponent::SkillBegin()
 {
 	float AttackSpeedRate =
-		SkillData->ComboActionData->AnimationSpeedRate;
+		SkillData->ComboActionData->AnimationSpeedRate *
+		LastSkillParams.SkillSpeedRate;
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
@@ -94,7 +99,7 @@ void UABCharacterSkillComponent::SkillBegin()
 	FOnMontageEnded EndDeligate;
 	EndDeligate.BindUObject(this, &UABCharacterSkillComponent::SkillEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillData->SkillMontage);
-	
+	OnSkillBegin.ExecuteIfBound();
 }
 
 void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
@@ -122,10 +127,10 @@ void UABCharacterSkillComponent::SetComboCheckTimer()
 		return;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UABCharacterSkillComponent::ComboCheck, ComboEffectiveTime, false);
+	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UABCharacterSkillComponent::CheckSkillCombo, ComboEffectiveTime, false);
 }
 
-void UABCharacterSkillComponent::ComboCheck()
+void UABCharacterSkillComponent::CheckSkillCombo()
 {
 	ComboTimerHandle.Invalidate();
 	//Check Next Command
@@ -141,9 +146,9 @@ void UABCharacterSkillComponent::ComboCheck()
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
 		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
 		SetComboCheckTimer();
+		
 		//Skill Redirection
 		SetSkillDirection(Movement->GetLastInputVector());
-
 		bHasNextComboCommand = false;
 	}
 }
@@ -171,9 +176,10 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
 	const FVector Start = GetOwner()->GetActorLocation() + ComboDirection * CapsuleComponent->GetScaledCapsuleRadius();
 	const FVector End = Start + 
-			ComboDirection * SkillData->SkillExtent.X;
+			ComboDirection * FVector(SkillData->SkillExtent);
+	const FCollisionShape CollisionShape = SkillData->GetCollisionShape(LastSkillParams.SkillExtentRate);
 
-	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, SkillData->GetCollisionShape(), Params);
+	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)
 	{
 
@@ -182,18 +188,20 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 		for (const FHitResult& HitResult : OutHitResults)
 		{
-			HitResult.GetActor()->TakeDamage(SkillData->SkillRawDamage, DamageEvent, Owner->GetController(), Owner);
+			float NewDamage = (SkillData->SkillRawDamage + LastSkillParams.SkillDamageModifier) * LastSkillParams.SkillDamageMultiplier;
+			HitResult.GetActor()->TakeDamage(NewDamage, DamageEvent, Owner->GetController(), Owner);
 		}
 
 	}
 
 	if (bDrawDebug)
 	{
-		const FVector Origin = Start + (End - Start) * 0.5f;
+		const FVector Origin = (Start + End) * 0.5f;
 		const FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 		const float DebugDuration = 1.0f;
 		DrawDebugSkillCollision(Origin, CollisionRotation, DrawColor, DebugDuration);
 	
+		//Draw hit point
 		for (const FHitResult& HitResult : OutHitResults)
 		{
 			DrawDebugBox(GetWorld(),HitResult.GetActor()->GetActorLocation(), FVector(20.0f), FColor::Blue, false, DebugDuration);
@@ -206,7 +214,7 @@ void UABCharacterSkillComponent::DrawDebugSkillCollision(const FVector& Center, 
 {
 	UWorld* World = GetWorld();
 
-	const FCollisionShape CollisionShape = SkillData->GetCollisionShape();
+	const FCollisionShape CollisionShape = SkillData->GetCollisionShape(LastSkillParams.SkillExtentRate);
 
 	switch (CollisionShape.ShapeType)
 	{
