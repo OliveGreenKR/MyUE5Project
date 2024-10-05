@@ -1,12 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/ABCharacterWidgetInterface.h"
 #include "Interface/ABCharacterItemInterface.h"
-#include "Interface/ABCharacterRedirectionInterface.h"
 #include "ABCharacterBase.generated.h"
 
 enum class EItemType : uint8;
@@ -32,7 +29,7 @@ struct FTakeItemDelegateWrapper
 };
 
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface, public IABCharacterItemInterface, public IABCharacterRedirectionInterface
+class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterWidgetInterface, public IABCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -53,23 +50,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
 
-#pragma region CharacterRedirection
-private:
-	// Inherited via IABCharacterRedirection
-	void CharacterRedireciton(const FVector& InDirection, const ERedirectionPrioirty prioirty) override;
-
-	FVector DesiredDirection;
-	ERedirectionPrioirty LastPriority = ERedirectionPrioirty::None;
-	bool bIsRedirectioning : 1 = false;
-
-#pragma endregion
-
 #pragma region Skill Components
 protected:
-	void ProcessSkill(const TObjectPtr<class UABCharacterSkillComponent> InSkill) const;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UABCharacterSkillComponent> BasicSkill;
+	TObjectPtr<class UABCharacterSkillComponent> BasicSkillComponent;
 #pragma endregion
 
 #pragma region Stat Component

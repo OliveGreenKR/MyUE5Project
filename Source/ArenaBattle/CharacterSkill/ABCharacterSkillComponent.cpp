@@ -2,10 +2,7 @@
 
 
 #include "CharacterSkill/ABCharacterSkillComponent.h"
-#include "Character/ABCharacterBase.h"
-#include "CharacterStat/ABCharacterStatComponent.h"
-#include "Interface/ABCharacterRedirectionInterface.h"
-#include "Character/ABCharacterBase.h"
+#include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
@@ -49,11 +46,11 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 }
 
-
-//void UABCharacterSkillComponent::OnRegister()
-//{
-//	Super::OnRegister();
-//}
+void UABCharacterSkillComponent::OnRegister()
+{
+	Super::OnRegister();
+	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
+}
 
 void UABCharacterSkillComponent::ProcessSkill()
 {
@@ -70,8 +67,7 @@ void UABCharacterSkillComponent::ProcessSkill()
 void UABCharacterSkillComponent::SkillBegin()
 {
 	float AttackSpeedRate =
-		SkillData->ComboActionData->AnimationSpeedRate *
-		OwnerCharacter->GetStat()->GetTotalStat().AttackSpeed;
+		SkillData->ComboActionData->AnimationSpeedRate;
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));

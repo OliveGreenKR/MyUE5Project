@@ -149,8 +149,8 @@ void AABStageGimmick::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 		AABStageGimmick* NewGimmick = GetWorld()->SpawnActorDeferred<AABStageGimmick>(AABStageGimmick::StaticClass(), NewTransform);
 		if (NewGimmick)
 		{
-			NewGimmick->SetState(EStageState::READY);
 			NewGimmick->SetStageNum(CurrentStageNum + 1);
+			NewGimmick->SetState(EStageState::READY);
 			NewGimmick->FinishSpawning(NewTransform);
 		}
 		
@@ -168,7 +168,6 @@ void AABStageGimmick::CloseAllGates()
 	DesiredDoorLocationZ = 0.0f;
 	bIsDoorRotating = true;
 }
-
 
 void AABStageGimmick::SetState(const EStageState InNewState)
 {
@@ -280,7 +279,10 @@ void AABStageGimmick::SpawnRewardBoxes()
 
 	for (const auto& RewardBox : RewardBoxes)
 	{
-		RewardBox.Get()->FinishSpawning(RewardBox.Get()->GetActorTransform());
+		if (RewardBox.IsValid())
+		{
+			RewardBox.Get()->FinishSpawning(RewardBox.Get()->GetActorTransform());
+		}
 	}
 }
 

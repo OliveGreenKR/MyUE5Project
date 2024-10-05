@@ -66,7 +66,6 @@ AABCharacterBase::AABCharacterBase()
 	{
 		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderRef.Object);
 	}
-
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/Warriors/AM_Dead.AM_Dead'"));
 	if (DeadMontageRef.Object)
 	{
@@ -75,7 +74,7 @@ AABCharacterBase::AABCharacterBase()
 
 
 	//Components
-	BasicSkill = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
+	BasicSkillComponent = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
 	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
 
 	HpBar = CreateDefaultSubobject<UABWidgetComponent>(TEXT("Widget"));
@@ -150,29 +149,11 @@ void AABCharacterBase::Tick(float DeltaTime)
 			1.0f    // Thickness of the lines
 		);
 
-		if (BasicSkill)
+		if (BasicSkillComponent)
 		{
-			BasicSkill->SetDrawDebug(true);
+			BasicSkillComponent->SetDrawDebug(true);
 		}
 
-	}
-#pragma endregion
-	
-#pragma region Redirection
-
-	if (bIsRedirectioning)
-	{
-		FRotator CurrentRotation = GetOwner()->GetActorRotation();
-		FRotator DesiredRotation = DesiredDirection.Rotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f);
-		GetOwner()->SetActorRotation(NewRotation);
-
-		//end rotate
-		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
-		{
-			bIsRedirectioning = false;
-			GetOwner()->SetActorRotation(DesiredRotation);
-		}
 	}
 #pragma endregion
 }
@@ -184,11 +165,6 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	Stat->ApplyDamage(DamageAmount);
 
 	return InTrueDamage;
-}
-
-void AABCharacterBase::ProcessSkill(const TObjectPtr<class UABCharacterSkillComponent> InSkill) const
-{
-	//request skill to Skill Comoponent.
 }
 
 const int32 AABCharacterBase::GetLevel()
@@ -275,17 +251,6 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
 {
 	UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
-}
-
-void AABCharacterBase::CharacterRedireciton(const FVector& InDirection, const ERedirectionPrioirty prioirty)
-{
-	//higher prioirity
-	if (static_cast<uint8>(prioirty) < static_cast<uint8>(LastPriority))
-	{
-		DesiredDirection = InDirection;
-		LastPriority = prioirty;
-		bIsRedirectioning = true;
-	}
 }
 
 

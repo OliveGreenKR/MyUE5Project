@@ -20,7 +20,7 @@ public:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	//virtual void OnRegister() override;
+	virtual void OnRegister() override;
 
 	void ProcessSkill();
 	inline void SetDrawDebug(bool InBool) { bDrawDebug = InBool; }
@@ -62,5 +62,5 @@ private:
 	bool bIsRedirectioning = false;
 	bool bDrawDebug = false;
 
-	TObjectPtr<class AABCharacterBase> OwnerCharacter;
+	TObjectPtr<class ACharacter> OwnerCharacter;
 };
