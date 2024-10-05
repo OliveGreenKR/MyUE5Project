@@ -16,7 +16,6 @@ UCLASS()
 class ARENABATTLE_API UABGameSingleton : public UObject
 {
 	GENERATED_BODY()
-	
 public:
 	UABGameSingleton();
 	static UABGameSingleton& Get();

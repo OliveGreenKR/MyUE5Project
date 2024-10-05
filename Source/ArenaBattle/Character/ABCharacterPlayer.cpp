@@ -8,6 +8,7 @@
 #include "Character/ABCharacterControlData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CharacterSkill/ABCharacterSkillComponent.h"
+#include "CharacterStat/ABCharacterStatComponent.h"
 
 AABCharacterPlayer::AABCharacterPlayer()
 {
@@ -193,9 +194,15 @@ void AABCharacterPlayer::Attack()
 	if (BasicSkillComponent)
 	{
 		using SkillParameters = UABCharacterSkillComponent::SkillParameters;
-		SkillParameters SkillParams = SkillParameters();
 
-		BasicSkillComponent->ProcessSkill(SkillParams, bDrawDebug);
+		SkillParameters OutSkillParams = SkillParameters();
+		FABCharacterStat TotalStat = Stat->GetTotalStat();
+
+		OutSkillParams.SkillDamageModifier = TotalStat.Attack;
+		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
+		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
+
+		BasicSkillComponent->ProcessSkill(OutSkillParams, bDrawDebug);
 	}
 }
 

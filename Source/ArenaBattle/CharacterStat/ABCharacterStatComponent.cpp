@@ -48,6 +48,5 @@ void UABCharacterStatComponent::BeginPlay()
 
 	SetLevelStat(CurrentLevel);
 	SetCurrentHp(GetTotalStat().MaxHp);
-
 }
 
