@@ -7,10 +7,10 @@ UABSkillData::UABSkillData()
 {
 }
 
-const FCollisionShape UABSkillData::GetCollisionShape(const FVector3f& ExtentMultiplier) const
+const FCollisionShape UABSkillData::GetCollisionShape(const FVector3f& ExtentModifier, const FVector3f& ExtentMultiplier) const
 {
 	FCollisionShape CollisionShape;
-	FVector3f NewExtent = SkillExtent * ExtentMultiplier;
+	FVector3f NewExtent = (SkillExtent + ExtentModifier) * ExtentMultiplier;
 
 	switch (CollisionShapeType)
 	{

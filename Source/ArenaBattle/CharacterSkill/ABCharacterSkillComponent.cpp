@@ -157,7 +157,6 @@ bool UABCharacterSkillComponent::SetSkillDirection( const FVector InDesiredDirec
 		? GetOwner()->GetActorForwardVector() 
 		: InDesiredDirection;
 
-	UE_LOG(LogTemp, Log, TEXT("ComboDirection : %s"), *InDesiredDirection.ToString());
 	bIsRedirectioning = true;
 	return true;
 }
@@ -173,9 +172,8 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
 	const FVector Start = GetOwner()->GetActorLocation() + ComboDirection * CapsuleComponent->GetScaledCapsuleRadius();
-	const FVector End = Start + 
-			ComboDirection * FVector(SkillData->SkillExtent);
-	const FCollisionShape CollisionShape = SkillData->GetCollisionShape(LastSkillParams.SkillExtentRate);
+	const FCollisionShape CollisionShape = GetCurrentSkillShape();
+	const FVector End = Start + ComboDirection * CollisionShape.GetExtent().X;
 
 	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)
@@ -212,7 +210,7 @@ void UABCharacterSkillComponent::DrawDebugSkillCollision(const FVector& Center, 
 {
 	UWorld* World = GetWorld();
 
-	const FCollisionShape CollisionShape = SkillData->GetCollisionShape(LastSkillParams.SkillExtentRate);
+	const FCollisionShape CollisionShape = GetCurrentSkillShape();
 
 	switch (CollisionShape.ShapeType)
 	{
@@ -228,6 +226,11 @@ void UABCharacterSkillComponent::DrawDebugSkillCollision(const FVector& Center, 
 		default:
 			break;
 	}
+}
+
+const FCollisionShape UABCharacterSkillComponent::GetCurrentSkillShape() const
+{
+	return SkillData->GetCollisionShape(FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
 }
 
 

@@ -21,6 +21,7 @@ public:
 	struct SkillParameters
 	{
 		float SkillSpeedRate = 1.0f;
+		float SkillRangeForwardModifier = 0.0f;
 		FVector3f SkillExtentRate = FVector3f::OneVector;
 		float SkillDamageModifier = 0.0f;
 		float SkillDamageMultiplier = 1.0f;
@@ -63,6 +64,8 @@ private:
 
 private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
+	FORCEINLINE const FCollisionShape GetCurrentSkillShape() const;
+
 
 private:
 	//When ComboMontage Begins, try to rotate to this.

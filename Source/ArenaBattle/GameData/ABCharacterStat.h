@@ -13,6 +13,7 @@ public:
 	FABCharacterStat() : 
 		MaxHp(0.0f), 
 		Attack(0.0f), 
+		AttackRangeForward(0.0f),
 		AttackRangeRate(0.0f),
 		AttackSpeedRate(0.0f), 
 		MovementSpeed(0.0f) {}
@@ -22,6 +23,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float Attack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float AttackRangeForward;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float AttackRangeRate;

@@ -200,6 +200,7 @@ void AABCharacterPlayer::Attack()
 
 		OutSkillParams.SkillDamageModifier = TotalStat.Attack;
 		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
+		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
 		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
 
 		BasicSkillComponent->ProcessSkill(OutSkillParams, bDrawDebug);

@@ -10,6 +10,8 @@
 #include "Item/ABItemData.h"
 #include "Engine/AssetManager.h"
 
+#include "Item/ABWeaponItemData.h"
+
 AABItemBox::AABItemBox()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -51,6 +53,7 @@ void AABItemBox::PostInitializeComponents()
 	Manager.GetPrimaryAssetIdList(TEXT("ABItemData"), Assets);
 	ensure(0 < Assets.Num());
 
+	//Random Item
 	int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
 	FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
 	if (AssetPtr.IsPending())
@@ -59,6 +62,13 @@ void AABItemBox::PostInitializeComponents()
 	}
 	Item = Cast<UABItemData>(AssetPtr.Get());
 	ensure(Item);
+
+	//for debug
+	UABWeaponItemData* WeaponItem = Cast<UABWeaponItemData>(Item);
+	if (WeaponItem)
+	{
+		RootComponent->SetWorldScale3D(FVector(1.25f));
+	}
 
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
 }
