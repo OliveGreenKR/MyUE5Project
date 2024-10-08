@@ -38,4 +38,8 @@ protected:
 
 	UFUNCTION()
 	void OnEffectFinished(class UParticleSystemComponent* ParticleSystem);
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Debug)
+	uint8 bIsRandom : 1 = true;
 };

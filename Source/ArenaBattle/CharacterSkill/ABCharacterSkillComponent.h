@@ -62,8 +62,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABSkillData> SkillData;
 
-	
-
 private:
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
@@ -72,7 +70,9 @@ private:
 
 private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
-	FORCEINLINE const FCollisionShape GetCurrentSkillShape() const;
+	
+	const FCollisionShape GetCurrentSkillShape() const;
+	const float GetCurrentSkillSpeedRate() const;
 
 
 private:

@@ -72,10 +72,6 @@ void UABCharacterSkillComponent::NextCombo()
 
 void UABCharacterSkillComponent::SkillBegin()
 {
-	float AttackSpeedRate =
-		SkillData->ComboActionData->AnimationSpeedRate *
-		LastSkillParams.SkillSpeedRate;
-
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
 
@@ -94,7 +90,7 @@ void UABCharacterSkillComponent::SkillBegin()
 	SetComboCheckTimer();
 
 	//Play Anim
-	AnimInstance->Montage_Play(SkillData->SkillMontage, AttackSpeedRate);
+	AnimInstance->Montage_Play(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
 
 	//Set Montage End Deligate
 	FOnMontageEnded EndDeligate;
@@ -120,10 +116,9 @@ void UABCharacterSkillComponent::SetComboCheckTimer()
 	int32 ComboIndex = GetCurrentCombo() - 1;
 	UABComboActionData* ComboActionData = SkillData->ComboActionData;
 	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-
-	float AttackSpeedRate = ComboActionData->AnimationSpeedRate * LastSkillParams.SkillSpeedRate;
 	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) * SkillData->SkillMontage->GetSectionLength(ComboIndex);
-	ComboEffectiveTime = ComboEffectiveTime / AttackSpeedRate;
+	ComboEffectiveTime = ComboEffectiveTime / GetCurrentSkillSpeedRate();
+
 	if (ComboEffectiveTime < 0)
 	{
 		return;
@@ -138,15 +133,15 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 	//Check Next Command
 	if (bHasNextComboCommand)
 	{
-		UABComboActionData* ComboActionData = SkillData->ComboActionData;
 		UAnimInstance * AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 		//NextCombo Index
 		NextCombo();
 
 		//Play Next Combo Animation
-		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, GetCurrentCombo());
+		FName NextSection = *FString::Printf(TEXT("%s%d"), *SkillData->ComboActionData->MontageSectionNamePrefix, GetCurrentCombo());
 		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
+		AnimInstance->Montage_SetPlayRate(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
 		SetComboCheckTimer();
 		
 		//Skill Redirection
@@ -234,7 +229,11 @@ void UABCharacterSkillComponent::DrawDebugSkillCollision(const FVector& Center, 
 
 const FCollisionShape UABCharacterSkillComponent::GetCurrentSkillShape() const
 {
-	return SkillData->GetCollisionShape(CurrentCombo - 1,FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
+	return SkillData->GetCollisionShape(CurrentCombo - 1, FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
 }
 
+const float UABCharacterSkillComponent::GetCurrentSkillSpeedRate() const
+{
+	return SkillData->ComboActionData->AnimationSpeedRate * LastSkillParams.SkillSpeedRate;
+}
 
