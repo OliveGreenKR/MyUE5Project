@@ -65,6 +65,11 @@ void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillPara
 	bHasNextComboCommand = ComboTimerHandle.IsValid();
 }
 
+void UABCharacterSkillComponent::NextCombo()
+{
+	CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, SkillData->ComboActionData->MaxComboCount); 
+}
+
 void UABCharacterSkillComponent::SkillBegin()
 {
 	float AttackSpeedRate =
@@ -75,7 +80,6 @@ void UABCharacterSkillComponent::SkillBegin()
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
 
 	CurrentCombo = 1;
-
 	
 	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 	
@@ -106,14 +110,14 @@ void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsPr
 	Movement->SetMovementMode(EMovementMode::MOVE_Walking);
 
 	ensure(CurrentCombo != 0);
-	CurrentCombo = 0;
+	ResetCombo();
 	bDrawDebug = false;
 	OnSkillEnd.ExecuteIfBound();
 }
 
 void UABCharacterSkillComponent::SetComboCheckTimer()
 {
-	int32 ComboIndex = CurrentCombo - 1;
+	int32 ComboIndex = GetCurrentCombo() - 1;
 	UABComboActionData* ComboActionData = SkillData->ComboActionData;
 	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
@@ -137,11 +141,11 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 		UABComboActionData* ComboActionData = SkillData->ComboActionData;
 		UAnimInstance * AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
-
-		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
+		//NextCombo Index
+		NextCombo();
 
 		//Play Next Combo Animation
-		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
+		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, GetCurrentCombo());
 		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
 		SetComboCheckTimer();
 		
@@ -169,7 +173,7 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 	UCapsuleComponent* CapsuleComponent = OwnerCharacter->GetCapsuleComponent();
 
-
+	const FSkillDataPerMotion& NowMotionData = SkillData->GetSkillMotionData(GetCurrentCombo() - 1);
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
 	const FVector Start = GetOwner()->GetActorLocation() + ComboDirection * CapsuleComponent->GetScaledCapsuleRadius();
 	const FCollisionShape CollisionShape = GetCurrentSkillShape();
@@ -184,7 +188,7 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 		for (const FHitResult& HitResult : OutHitResults)
 		{
-			float NewDamage = (SkillData->SkillRawDamage + LastSkillParams.SkillDamageModifier) * LastSkillParams.SkillDamageMultiplier;
+			float NewDamage = (NowMotionData.SkillRawDamage + LastSkillParams.SkillDamageModifier) * LastSkillParams.SkillDamageMultiplier;
 			HitResult.GetActor()->TakeDamage(NewDamage, DamageEvent, Owner->GetController(), Owner);
 		}
 
@@ -230,7 +234,7 @@ void UABCharacterSkillComponent::DrawDebugSkillCollision(const FVector& Center, 
 
 const FCollisionShape UABCharacterSkillComponent::GetCurrentSkillShape() const
 {
-	return SkillData->GetCollisionShape(FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
+	return SkillData->GetCollisionShape(CurrentCombo - 1,FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
 }
 
 

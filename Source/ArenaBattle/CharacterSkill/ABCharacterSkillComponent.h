@@ -42,13 +42,18 @@ public:
 	FOnCharacterSkillEndDelegate OnSkillEnd;
 	FOnCharacterSkillBeginDelegate OnSkillBegin;
 
+	FORCEINLINE bool IsCombo() const		{ return (CurrentCombo > 0); }
+	FORCEINLINE int32 GetCurrentCombo()		{ return CurrentCombo; }
+	FORCEINLINE void ResetCombo()			{ CurrentCombo = 0; }
+
+protected:
+	void NextCombo();
+
 private:
 	void SkillBegin();
 	void SkillEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-
 	void SetComboCheckTimer();
 	virtual void CheckSkillCombo();
-	inline bool IsCombo() const { return (CurrentCombo > 0); }
 
 	UFUNCTION(BlueprintCallable, Category = "Combo")
 	bool SetSkillDirection( const FVector InDesiredDirection);
@@ -57,6 +62,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABSkillData> SkillData;
 
+	
+
+private:
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
 private:
@@ -75,6 +83,5 @@ private:
 
 	SkillParameters LastSkillParams = SkillParameters();
 	TObjectPtr<class ACharacter> OwnerCharacter;
-
 
 };

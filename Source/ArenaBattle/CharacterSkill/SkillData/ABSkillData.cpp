@@ -7,12 +7,13 @@ UABSkillData::UABSkillData()
 {
 }
 
-const FCollisionShape UABSkillData::GetCollisionShape(const FVector3f& ExtentModifier, const FVector3f& ExtentMultiplier) const
+const FCollisionShape UABSkillData::GetCollisionShape(const int32 InMotionIndex, const FVector3f& ExtentModifier, const FVector3f& ExtentMultiplier) const
 {
 	FCollisionShape CollisionShape;
-	FVector3f NewExtent = (SkillExtent + ExtentModifier) * ExtentMultiplier;
+	const FSkillDataPerMotion& NowMotion = GetSkillMotionData(InMotionIndex);
+	FVector3f NewExtent = (NowMotion.SkillExtent + ExtentModifier) * ExtentMultiplier;
 
-	switch (CollisionShapeType)
+	switch (NowMotion.CollisionShapeType)
 	{
 		case ESkillCollisionShape::Box:
 		{
@@ -32,4 +33,10 @@ const FCollisionShape UABSkillData::GetCollisionShape(const FVector3f& ExtentMod
 	}
 
 	return CollisionShape;
+}
+
+void UABSkillData::PostInitProperties()
+{
+	Super::PostInitProperties();
+	ensureMsgf(MotionDatas.Num() < 0 , TEXT("Check MotionData for %s"),*GetName());
 }

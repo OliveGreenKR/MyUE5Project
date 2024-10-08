@@ -17,6 +17,7 @@ class ARENABATTLE_API UABComboActionData : public UPrimaryDataAsset
 public:
 	UABComboActionData();
 
+public:
 	UPROPERTY(EditAnywhere, Category = Name)
 	FString MontageSectionNamePrefix;
 
