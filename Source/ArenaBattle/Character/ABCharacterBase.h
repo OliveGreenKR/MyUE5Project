@@ -108,7 +108,7 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Weapon;
+	TObjectPtr<class USkeletalMeshComponent> WeaponSocket;
 
 	UPROPERTY()
 	TMap<EItemType,FTakeItemDelegateWrapper> TakeItemActions;

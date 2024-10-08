@@ -117,7 +117,7 @@ void UABCharacterSkillComponent::SetComboCheckTimer()
 	UABComboActionData* ComboActionData = SkillData->ComboActionData;
 	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
-	float AttackSpeedRate = ComboActionData->AnimationSpeedRate;
+	float AttackSpeedRate = ComboActionData->AnimationSpeedRate * LastSkillParams.SkillSpeedRate;
 	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) * SkillData->SkillMontage->GetSectionLength(ComboIndex);
 	ComboEffectiveTime = ComboEffectiveTime / AttackSpeedRate;
 	if (ComboEffectiveTime < 0)

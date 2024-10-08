@@ -96,8 +96,8 @@ AABCharacterBase::AABCharacterBase()
 	TakeItemActions.Add(EItemType::Scroll, FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::ReadScroll)));
 
 	//Equipment
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
+	WeaponSocket = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	WeaponSocket->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
 void AABCharacterBase::PostInitializeComponents()
@@ -238,7 +238,7 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 			WeaponItemData->WeaponMesh.LoadSynchronous();
 		}
 
-		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+		WeaponSocket->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
 		Stat->SetModifierStat(WeaponItemData->ModifierStat);
 	}
 }
