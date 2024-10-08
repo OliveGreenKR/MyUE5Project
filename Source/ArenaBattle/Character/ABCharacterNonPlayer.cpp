@@ -19,15 +19,18 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 
 void AABCharacterNonPlayer::SetDead()
 {
-	//Super::SetDead();
-	//
-	//FTimerHandle DeadTimerHandle;
+	if (bIsDummy)
+		return;
 
-	//GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
-	//	[&]() {
-	//		Destroy();
-	//	}),
-	//	DeadEventDelayTime, false);
+	Super::SetDead();
+	
+	FTimerHandle DeadTimerHandle;
+
+	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
+		[&]() {
+			Destroy();
+		}),
+		DeadEventDelayTime, false);
 }
 
 void AABCharacterNonPlayer::NPCMeshLoadCompleted()

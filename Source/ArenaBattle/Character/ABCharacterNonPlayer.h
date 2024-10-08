@@ -30,4 +30,8 @@ protected:
 
 	//Load with Asynchronous 
 	TSharedPtr<FStreamableHandle> NPCMeshHandle;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Debug)
+	uint8 bIsDummy : 1 = 0;
 };
