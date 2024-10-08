@@ -47,17 +47,17 @@ void AABItemBox::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	//IsPlayingGame?
+	if (GetWorld() && !GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+
 	UAssetManager& Manager = UAssetManager::Get();
 
 	TArray<FPrimaryAssetId> Assets;
 	Manager.GetPrimaryAssetIdList(TEXT("ABItemData"), Assets);
-
-	// Ensure AssetManager is initialized
-	if (0 >= Assets.Num())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AssetManager is not valid"));
-		return;
-	}
+	ensure(Assets.Num() < 0);
 
 	if (bIsRandom)
 	{

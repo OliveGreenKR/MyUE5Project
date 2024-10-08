@@ -11,6 +11,12 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	//IsPlayingGame?
+	if (GetWorld() && !GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+
 	ensure(NPCMeshes.Num() > 0);
 	int32 RandIndex = FMath::RandRange(0, NPCMeshes.Num() - 1);
 	NPCMeshHandle = UAssetManager::Get().GetStreamableManager().

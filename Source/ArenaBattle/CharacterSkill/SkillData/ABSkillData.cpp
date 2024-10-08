@@ -38,5 +38,8 @@ const FCollisionShape UABSkillData::GetCollisionShape(const int32 InMotionIndex,
 void UABSkillData::PostInitProperties()
 {
 	Super::PostInitProperties();
-	ensureMsgf(MotionDatas.Num() < 0 , TEXT("Check MotionData for %s"),*GetName());
+	if (GetWorld() && GetWorld()->IsGameWorld())
+	{
+		ensureMsgf(MotionDatas.Num() < 0, TEXT("Check MotionData for %s"), *GetName());
+	}
 }

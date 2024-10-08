@@ -20,7 +20,7 @@ struct FSkillDataPerMotion
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (ToolTip = "Forward, Width, Height"))
-	FVector3f SkillExtent;
+	FVector3f SkillExtent =  FVector3f::ZeroVector;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (ToolTip = "-1 is just Frame"))
 	float SkillEffectiveTime = -1.0f;
