@@ -1,5 +1,6 @@
 #include "Character/ABCharacterNonPlayer.h"
 #include "Engine/AssetManager.h"
+#include "CharacterStat/ABCharacterStatComponent.h"
 
 AABCharacterNonPlayer::AABCharacterNonPlayer()
 {
@@ -18,15 +19,15 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 
 void AABCharacterNonPlayer::SetDead()
 {
-	Super::SetDead();
-	
-	FTimerHandle DeadTimerHandle;
+	//Super::SetDead();
+	//
+	//FTimerHandle DeadTimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
-		[&]() {
-			Destroy();
-		}),
-		DeadEventDelayTime, false);
+	//GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
+	//	[&]() {
+	//		Destroy();
+	//	}),
+	//	DeadEventDelayTime, false);
 }
 
 void AABCharacterNonPlayer::NPCMeshLoadCompleted()

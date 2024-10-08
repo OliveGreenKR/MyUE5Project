@@ -159,6 +159,14 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	Stat->ApplyDamage(DamageAmount);
 
+	if (bDrawDebug)
+	{
+		const FVector TopOfCapsule = GetActorLocation() + FVector(0.f, 0.f, GetSimpleCollisionHalfHeight() + 10.0f);
+		const FColor DebugColor = FColor::Red;
+		FString DebugText = FString::Printf(TEXT("Last Taken Damage : %.3f "), DamageAmount);
+		DrawDebugString(GetWorld(), TopOfCapsule, DebugText, nullptr, DebugColor, 1.f, true);
+	}
+
 	return InTrueDamage;
 }
 
