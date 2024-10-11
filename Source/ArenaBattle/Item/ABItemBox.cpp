@@ -50,10 +50,11 @@ void AABItemBox::PostInitializeComponents()
 	UAssetManager& Manager = UAssetManager::Get();
 	TArray<FPrimaryAssetId> Assets;
 	Manager.GetPrimaryAssetIdList(TEXT("ABItemData"), Assets);
-	ensure(Assets.Num() < 0);
+	
 
 	if (GetWorld() && GetWorld()->IsGameWorld() && bIsRandom)
 	{
+		ensure(Assets.Num() < 0);
 		//Random Item
 		int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
 		FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));

@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "Character/ABCharacterBase.h"
 #include "Engine/StreamableManager.h"
+#include "Interface/ABCharacterAIInterface.h"
 #include "ABCharacterNonPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS(config=ArenaBattle)
-class ARENABATTLE_API AABCharacterNonPlayer : public AABCharacterBase
+class ARENABATTLE_API AABCharacterNonPlayer : public AABCharacterBase , 
+	public IABCharacterAIInterface
 {
 	GENERATED_BODY()
 	
@@ -34,4 +36,15 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Debug)
 	uint8 bIsDummy : 1 = 0;
+
+#pragma region AI
+protected:
+	// Inherited via IABCharacterAIInterface
+	virtual float GetAIPatrolRadius() override;
+	virtual float GetAIDetectRange() override;
+	virtual float GetAIAttackRange() override;
+	virtual float GetAITurnSpeed() override;
+private:
+	bool GetAIDrawDebug() override { return bDrawDebug; }
+#pragma endregion
 };
