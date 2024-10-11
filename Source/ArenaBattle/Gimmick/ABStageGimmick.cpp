@@ -87,6 +87,7 @@ void AABStageGimmick::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
  	SetState(CurrentState);
+	LoadRewardBoxes();
 }
 
 void AABStageGimmick::Tick(float DeltaTime)
@@ -111,6 +112,34 @@ void AABStageGimmick::Tick(float DeltaTime)
 				bIsDoorRotating = false;
 			}
 			
+		}
+	}
+
+
+	//Box Spawning
+	if (bIsItemBoxSpawn)
+	{
+		for (const auto& RewardBox : RewardBoxes)
+		{
+			if (!RewardBox.IsValid())
+			{
+				continue;
+			}
+			FVector CurrentLocation = RewardBox.Get()->GetActorLocation();
+			FVector DesiredLocation = CurrentLocation;
+			DesiredLocation.SetComponentForAxis(EAxis::Z, 30.0f);
+
+			FVector NewLocation = FMath::VInterpTo(CurrentLocation, DesiredLocation, DeltaTime, 10.0f);
+
+			if (NewLocation.Equals(CurrentLocation, SCENECOMPONENT_ROTATOR_TOLERANCE))
+			{
+				RewardBox.Get()->SetActorEnableCollision(true);
+				bIsItemBoxSpawn = false;
+			}
+			else
+			{
+				RewardBox.Get()->SetActorLocation(NewLocation);
+			}
 		}
 	}
 	
@@ -263,9 +292,22 @@ void AABStageGimmick::OnRewardTriggerBeginOverlap(UPrimitiveComponent* Overlappe
 
 void AABStageGimmick::SpawnRewardBoxes()
 {
+	for (const auto& RewardBox : RewardBoxes)
+	{
+		if (RewardBox.IsValid())
+		{
+			RewardBox.Get()->SetActorHiddenInGame(false);
+			//RewardBox.Get()->SetActorEnableCollision(true);
+			bIsItemBoxSpawn = true;
+		}
+	}
+}
+
+void AABStageGimmick::LoadRewardBoxes()
+{
 	for (const auto& RewardBoxLocation : RewardBoxLocations)
 	{
-		FVector WorldSpawnLocation = GetActorLocation() + RewardBoxLocation.Value + FVector(0.0f, 0.0f, 30.0f);
+		FVector WorldSpawnLocation = GetActorLocation() + RewardBoxLocation.Value + FVector(0.0f, 0.0f, -100.0f);
 
 		FTransform SpawnTransform(WorldSpawnLocation);
 		AABItemBox* RewardBoxActor = GetWorld()->SpawnActorDeferred<AABItemBox>(RewardBoxClass, SpawnTransform);
@@ -274,6 +316,8 @@ void AABStageGimmick::SpawnRewardBoxes()
 			RewardBoxActor->Tags.Add(RewardBoxLocation.Key);
 			RewardBoxActor->GetTrigger()->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnRewardTriggerBeginOverlap);
 			RewardBoxes.Add(RewardBoxActor);
+			RewardBoxActor->SetActorHiddenInGame(true);
+			RewardBoxActor->SetActorEnableCollision(false);
 		}
 	}
 

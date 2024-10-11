@@ -112,8 +112,10 @@ protected:
 
 	UFUNCTION()
 	void OnRewardTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+private:
+	bool bIsItemBoxSpawn : 1 = false;
 	void SpawnRewardBoxes();
+	void LoadRewardBoxes();
 
 	//Stage Stat Scetion
 public:
