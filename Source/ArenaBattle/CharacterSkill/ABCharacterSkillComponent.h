@@ -33,8 +33,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void OnRegister() override;
 
-	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
+	void ProcessSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug = false);
 
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	void ForcelySetSkillDirection (FVector InDesiredDirection) { ComboDirection = InDesiredDirection;}
 public:
 
 	FOnCharacterSkillEndDelegate OnSkillEnd;
@@ -43,7 +45,6 @@ public:
 	FORCEINLINE bool IsCombo() const		{ return (CurrentCombo > 0); }
 	FORCEINLINE int32 GetCurrentCombo()		{ return CurrentCombo; }
 	FORCEINLINE void ResetCombo()			{ CurrentCombo = 0; }
-
 
 
 protected:
@@ -55,8 +56,7 @@ private:
 	void SetComboCheckTimer();
 	virtual void CheckSkillCombo();
 
-	UFUNCTION(BlueprintCallable, Category = "Combo")
-	bool SetSkillDirection( const FVector InDesiredDirection);
+	void SetSkilDirectionToDesired();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
@@ -90,6 +90,7 @@ private:
 private:
 	//Normalized. When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
+	FVector LastDesiredDirection;
 	bool bIsRedirectioning : 1 = false;
 	bool bDrawDebug : 1 = false;
 

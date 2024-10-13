@@ -28,6 +28,7 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	//redirecting to ComboDireciton
 	if (bIsRedirectioning)
 	{
 		FRotator CurrentRotation = GetOwner()->GetActorRotation();
@@ -51,7 +52,7 @@ void UABCharacterSkillComponent::OnRegister()
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 }
 
-void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug)
+void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug)
 {
 	//First
 	if (!IsCombo() && !OwnerCharacter->GetCharacterMovement()->IsFalling())
@@ -61,7 +62,7 @@ void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillPara
 		SkillBegin();
 		return;
 	}
-
+	LastDesiredDirection = DesiredDiretion;
 	bHasNextComboCommand = ComboTimerHandle.IsValid();
 }
 
@@ -81,9 +82,7 @@ void UABCharacterSkillComponent::SkillBegin()
 	
 	//character stop
 	Movement->SetMovementMode(EMovementMode::MOVE_None);
-
-	//Set deffault ComboDireciton 
-	SetSkillDirection(Movement->GetLastInputVector());
+	SetSkilDirectionToDesired();
 
 	//TimerSet
 	ComboTimerHandle.Invalidate();
@@ -134,7 +133,6 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 	if (bHasNextComboCommand)
 	{
 		UAnimInstance * AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 		//NextCombo Index
 		SetComboNext();
 
@@ -144,17 +142,16 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 		AnimInstance->Montage_SetPlayRate(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
 		SetComboCheckTimer();
 		
-		//Skill Redirection
-		SetSkillDirection(Movement->GetLastInputVector());
+		//Skill Redirection to Desired
+		SetSkilDirectionToDesired();
 		bHasNextComboCommand = false;
 	}
 }
 
-bool UABCharacterSkillComponent::SetSkillDirection( const FVector InDesiredDirection)
+void UABCharacterSkillComponent::SetSkilDirectionToDesired()
 {
-	ComboDirection = InDesiredDirection.GetSafeNormal(UE_SMALL_NUMBER,GetOwner()->GetActorForwardVector());
+	ComboDirection = LastDesiredDirection.GetSafeNormal(UE_SMALL_NUMBER,GetOwner()->GetActorForwardVector());
 	bIsRedirectioning = true;
-	return true;
 }
 
 void UABCharacterSkillComponent::PerformSkillHitCheck()

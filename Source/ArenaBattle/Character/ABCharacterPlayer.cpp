@@ -207,7 +207,7 @@ void AABCharacterPlayer::Attack()
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
 		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
 
-		BasicSkillComponent->ProcessSkill(OutSkillParams, bDrawDebug);
+		BasicSkillComponent->ProcessSkill(OutSkillParams, GetCharacterMovement()->GetLastInputVector(), bDrawDebug);
 	}
 }
 
