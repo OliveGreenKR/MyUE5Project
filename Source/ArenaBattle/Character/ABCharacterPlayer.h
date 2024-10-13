@@ -19,6 +19,7 @@ public:
 	AABCharacterPlayer();
 
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 
 public:

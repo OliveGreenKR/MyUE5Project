@@ -22,7 +22,6 @@ public:
 
 protected:
 	virtual void PostInitializeComponents() override;
-
 protected:
 	void SetDead() override;
 	void NPCMeshLoadCompleted();
@@ -38,12 +37,17 @@ protected:
 	uint8 bIsDummy : 1 = 0;
 
 #pragma region AI
+public:
+	FAICharacterAttackFinished OnAttackFinished;
 protected:
 	// Inherited via IABCharacterAIInterface
 	virtual float GetAIPatrolRadius() override;
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
+
+	void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
+	void AttackByAI() override;
 private:
 	bool GetAIDrawDebug() override { return bDrawDebug; }
 #pragma endregion

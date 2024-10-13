@@ -63,11 +63,15 @@ AABCharacterPlayer::AABCharacterPlayer()
 
 }
 
+void AABCharacterPlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	GetCharacterMovement()->JumpZVelocity = 500.f;  //default =700
+}
+
 void AABCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetCharacterMovement()->JumpZVelocity = 500.f;  //default =700
 	SetCharacterControl(CurrentCharacterControlType);
 }
 

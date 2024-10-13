@@ -65,7 +65,7 @@ void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillPara
 	bHasNextComboCommand = ComboTimerHandle.IsValid();
 }
 
-void UABCharacterSkillComponent::NextCombo()
+void UABCharacterSkillComponent::SetComboNext()
 {
 	CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, SkillData->ComboActionData->MaxComboCount); 
 }
@@ -136,7 +136,7 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 		UAnimInstance * AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 		//NextCombo Index
-		NextCombo();
+		SetComboNext();
 
 		//Play Next Combo Animation
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *SkillData->ComboActionData->MontageSectionNamePrefix, GetCurrentCombo());
@@ -168,7 +168,7 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	const FVector Start = GetOwner()->GetActorLocation() +
 		ComboDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FCollisionShape CollisionShape = GetCurrentSkillShape();
-	const FVector End = GetOwner()->GetActorLocation() + ComboDirection * GetSkillRange(CurrentCombo - 1);
+	const FVector End = GetOwner()->GetActorLocation() + ComboDirection * GetCurrentSkillRange();
 
 	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)

@@ -17,6 +17,7 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	ensure(BasicSkillComponent->IsValidLowLevel());
 	ensure(NPCMeshes.Num() > 0);
 	int32 RandIndex = FMath::RandRange(0, NPCMeshes.Num() - 1);
 	NPCMeshHandle = UAssetManager::Get().GetStreamableManager().
@@ -82,5 +83,33 @@ float AABCharacterNonPlayer::GetAIAttackRange()
 float AABCharacterNonPlayer::GetAITurnSpeed()
 {
 	return 0.0f;
+}
+
+void AABCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+{
+	OnAttackFinished = InOnAttackFinished;
+	BasicSkillComponent->OnSkillEnd.BindLambda([&]() 
+											   {
+												   OnAttackFinished.ExecuteIfBound();
+											   });
+}
+
+void AABCharacterNonPlayer::AttackByAI()
+{
+	if (BasicSkillComponent)
+	{
+		using SkillParameters = UABCharacterSkillComponent::SkillParameters;
+
+		SkillParameters OutSkillParams = SkillParameters();
+		FABCharacterStat TotalStat = Stat->GetTotalStat();
+
+		OutSkillParams.SkillDamageModifier =  bDrawDebug ? -80 : TotalStat.Attack;
+
+		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
+		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
+		OutSkillParams.SkillSpeedRate = bDrawDebug ? 0.85f : TotalStat.AttackSpeedRate;
+
+		BasicSkillComponent->ProcessSkill(OutSkillParams, bDrawDebug);
+	}
 }
 

@@ -13,8 +13,10 @@ class UABCharacterAIInterface : public UInterface
 	GENERATED_BODY()
 };
 
+DECLARE_DELEGATE(FAICharacterAttackFinished);
+
 /**
- * 
+ *  Interface for requesting necessary actions for character AI operations.
  */
 class ARENABATTLE_API IABCharacterAIInterface
 {
@@ -28,6 +30,6 @@ public:
 	virtual float GetAITurnSpeed() = 0;
 	virtual bool GetAIDrawDebug() { return false; }
 
-	//virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) = 0;
-	//virtual void AttackByAI() = 0;
+	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) = 0;
+	virtual void AttackByAI() = 0;
 };

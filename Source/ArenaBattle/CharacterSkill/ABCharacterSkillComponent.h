@@ -47,7 +47,7 @@ public:
 
 
 protected:
-	void NextCombo();
+	void SetComboNext();
 
 private:
 	void SkillBegin();

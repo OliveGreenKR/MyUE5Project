@@ -82,12 +82,15 @@ AABStageGimmick::AABStageGimmick()
 	CurrentStageNum = 0;
 }
 
+void AABStageGimmick::BeginPlay()
+{
+	LoadRewardBoxes();
+}
+
 void AABStageGimmick::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-
  	SetState(CurrentState);
-	LoadRewardBoxes();
 }
 
 void AABStageGimmick::Tick(float DeltaTime)
@@ -313,7 +316,7 @@ void AABStageGimmick::LoadRewardBoxes()
 
 		FTransform SpawnTransform(WorldSpawnLocation);
 		AABItemBox* RewardBoxActor = GetWorld()->SpawnActorDeferred<AABItemBox>(RewardBoxClass, SpawnTransform);
-		if (RewardBoxActor)
+		if (RewardBoxActor->IsValidLowLevelFast())
 		{
 			RewardBoxActor->Tags.Add(RewardBoxLocation.Key);
 			RewardBoxActor->GetTrigger()->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnRewardTriggerBeginOverlap);
