@@ -73,10 +73,13 @@ AABCharacterBase::AABCharacterBase()
 	}
 
 
-	//Components
+	//SkillComponents
 	BasicSkillComponent = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
+
+	//Stats
 	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
 
+	//HpBar
 	HpBar = CreateDefaultSubobject<UABWidgetComponent>(TEXT("Widget"));
 	HpBar->SetupAttachment(GetMesh());
 	HpBar->SetRelativeLocation(FVector(0, 0, 180.0f));

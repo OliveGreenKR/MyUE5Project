@@ -274,6 +274,7 @@ void AABStageGimmick::OnOpponentSpawn()
 
 void AABStageGimmick::OnRewardTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	//Destroy ValidItemBox
 	for (const auto& RewardBox : RewardBoxes)
 	{
 		if (RewardBox.IsValid())
@@ -305,6 +306,7 @@ void AABStageGimmick::SpawnRewardBoxes()
 
 void AABStageGimmick::LoadRewardBoxes()
 {
+	//Load When OnConstrution
 	for (const auto& RewardBoxLocation : RewardBoxLocations)
 	{
 		FVector WorldSpawnLocation = GetActorLocation() + RewardBoxLocation.Value + FVector(0.0f, 0.0f, -100.0f);

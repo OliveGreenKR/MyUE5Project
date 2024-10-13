@@ -1,6 +1,7 @@
 #include "Character/ABCharacterNonPlayer.h"
 #include "Engine/AssetManager.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "AI/ABAIController.h"
 
 AABCharacterNonPlayer::AABCharacterNonPlayer()
@@ -75,7 +76,7 @@ float AABCharacterNonPlayer::GetAIDetectRange()
 
 float AABCharacterNonPlayer::GetAIAttackRange()
 {
-	return 0.0f;
+	return BasicSkillComponent->GetNextSkillAttackRange();
 }
 
 float AABCharacterNonPlayer::GetAITurnSpeed()

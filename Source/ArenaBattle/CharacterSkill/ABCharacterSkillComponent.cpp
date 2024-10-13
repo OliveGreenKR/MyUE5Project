@@ -152,10 +152,7 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 
 bool UABCharacterSkillComponent::SetSkillDirection( const FVector InDesiredDirection)
 {
-	ComboDirection = (InDesiredDirection == FVector::ZeroVector) 
-		? GetOwner()->GetActorForwardVector() 
-		: InDesiredDirection;
-
+	ComboDirection = InDesiredDirection.GetSafeNormal(UE_SMALL_NUMBER,GetOwner()->GetActorForwardVector());
 	bIsRedirectioning = true;
 	return true;
 }
@@ -166,13 +163,12 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	//tag :Attack
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, GetOwner());
 
-	UCapsuleComponent* CapsuleComponent = OwnerCharacter->GetCapsuleComponent();
-
 	const FSkillDataPerMotion& NowMotionData = SkillData->GetSkillMotionData(GetCurrentCombo() - 1);
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
-	const FVector Start = GetOwner()->GetActorLocation() + ComboDirection * CapsuleComponent->GetScaledCapsuleRadius();
+	const FVector Start = GetOwner()->GetActorLocation() +
+		ComboDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FCollisionShape CollisionShape = GetCurrentSkillShape();
-	const FVector End = Start + ComboDirection * CollisionShape.GetExtent().X;
+	const FVector End = GetOwner()->GetActorLocation() + ComboDirection * GetSkillRange(CurrentCombo - 1);
 
 	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)
@@ -227,13 +223,18 @@ void UABCharacterSkillComponent::DrawDebugSkillCollision(const FVector& Center, 
 	}
 }
 
-const FCollisionShape UABCharacterSkillComponent::GetCurrentSkillShape() const
-{
-	return SkillData->GetCollisionShape(CurrentCombo - 1, FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
-}
-
 const float UABCharacterSkillComponent::GetCurrentSkillSpeedRate() const
 {
 	return SkillData->ComboActionData->AnimationSpeedRate * LastSkillParams.SkillSpeedRate;
 }
 
+const FCollisionShape UABCharacterSkillComponent::GetSkillShape(int32 SkillIdx) const
+{
+	return SkillData->GetCollisionShape(SkillIdx, FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
+}
+
+const float UABCharacterSkillComponent::GetSkillRange(int32 SkillIdx) const
+{
+	return OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius()
+		+ GetSkillShape(SkillIdx).GetExtent().X;
+}

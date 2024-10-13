@@ -34,9 +34,7 @@ public:
 	virtual void OnRegister() override;
 
 	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
-	
-	//IABAnimationAttackInterface 
-	virtual void PerformSkillHitCheck();
+
 public:
 
 	FOnCharacterSkillEndDelegate OnSkillEnd;
@@ -45,6 +43,8 @@ public:
 	FORCEINLINE bool IsCombo() const		{ return (CurrentCombo > 0); }
 	FORCEINLINE int32 GetCurrentCombo()		{ return CurrentCombo; }
 	FORCEINLINE void ResetCombo()			{ CurrentCombo = 0; }
+
+
 
 protected:
 	void NextCombo();
@@ -71,12 +71,24 @@ private:
 private:
 	void DrawDebugSkillCollision(const FVector& Center, const FQuat& Rotation, const FColor& Color, float LifeTime, float DepthPriority = (uint8)0U, float Thickness = 0.0f) const;
 	
-	const FCollisionShape GetCurrentSkillShape() const;
-	const float GetCurrentSkillSpeedRate() const;
+#pragma region SkillExtent
+public:
+	//IABAnimationAttackInterface 
+	virtual void PerformSkillHitCheck();
+	FORCEINLINE const float GetNextSkillAttackRange() const { return GetSkillRange(CurrentCombo); }
 
+protected:
+	FORCEINLINE const FCollisionShape GetCurrentSkillShape() const { return GetSkillShape(CurrentCombo - 1); }
+	const float GetCurrentSkillSpeedRate() const;
+	FORCEINLINE const float GetCurrentSkillRange() const { return GetSkillRange(CurrentCombo - 1); }
 
 private:
-	//When ComboMontage Begins, try to rotate to this.
+	const FCollisionShape GetSkillShape(int32 SkillIdx) const;
+	const float GetSkillRange(int32 SkillIdx) const;
+#pragma endregion
+
+private:
+	//Normalized. When ComboMontage Begins, try to rotate to this.
 	FVector ComboDirection;
 	bool bIsRedirectioning : 1 = false;
 	bool bDrawDebug : 1 = false;
