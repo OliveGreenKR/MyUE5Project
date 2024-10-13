@@ -84,6 +84,7 @@ AABStageGimmick::AABStageGimmick()
 
 void AABStageGimmick::BeginPlay()
 {
+	Super::BeginPlay();
 	LoadRewardBoxes();
 }
 
