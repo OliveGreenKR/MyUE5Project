@@ -72,7 +72,6 @@ AABCharacterBase::AABCharacterBase()
 		DeadMontage = DeadMontageRef.Object;
 	}
 
-
 	//SkillComponents
 	BasicSkillComponent = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
 

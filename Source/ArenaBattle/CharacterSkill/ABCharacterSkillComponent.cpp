@@ -24,6 +24,20 @@ UABCharacterSkillComponent::UABCharacterSkillComponent()
 	}
 }
 
+void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug)
+{
+	ProcessSkill(InSkillParams, DesiredDiretion, DrawDebug);
+}
+
+void UABCharacterSkillComponent::CancelSkill()
+{
+}
+
+const float UABCharacterSkillComponent::GetSkillRange() const
+{
+	return GetNextSkillAttackRange();
+}
+
 void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

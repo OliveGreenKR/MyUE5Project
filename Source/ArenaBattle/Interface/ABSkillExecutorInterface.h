@@ -6,6 +6,9 @@
 #include "UObject/Interface.h"
 #include "ABSkillExecutorInterface.generated.h"
 
+DECLARE_DELEGATE(FOnCharacterSkillEndDelegate);
+DECLARE_DELEGATE(FOnCharacterSkillBeginDelegate);
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UABSkillExecutorInterface : public UInterface
@@ -26,10 +29,17 @@ public:
 	struct SkillParameters
 	{
 		float SkillSpeedRate = 1.0f;
+		float SkillRangeForwardModifier = 0.0f;
 		FVector3f SkillExtentRate = FVector3f::OneVector;
 		float SkillDamageModifier = 0.0f;
-		float SkillDamageMultiplier= 1.0f;
+		float SkillDamageMultiplier = 1.0f;
 	};
+public:
+	virtual void ExecuteSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug = false) = 0;
+	virtual void CancelSkill() = 0;
+	virtual void ForcelySetSkillDirection(FVector InDesiredDirection) = 0;
+	virtual const float GetSkillRange() const = 0;
 
-	virtual void ExecuteSkill(const SkillParameters& InSkillParams) = 0;
+	FOnCharacterSkillEndDelegate OnSkillEnd;
+	FOnCharacterSkillBeginDelegate OnSkillBegin;
 };

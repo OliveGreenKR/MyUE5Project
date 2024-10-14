@@ -197,7 +197,7 @@ void AABCharacterPlayer::Attack()
 {
 	if (BasicSkillComponent)
 	{
-		using SkillParameters = UABCharacterSkillComponent::SkillParameters;
+		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
 
 		SkillParameters OutSkillParams = SkillParameters();
 		FABCharacterStat TotalStat = Stat->GetTotalStat();
@@ -207,7 +207,7 @@ void AABCharacterPlayer::Attack()
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
 		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
 
-		BasicSkillComponent->ProcessSkill(OutSkillParams, GetCharacterMovement()->GetLastInputVector(), bDrawDebug);
+		BasicSkillComponent->ExecuteSkill(OutSkillParams, GetCharacterMovement()->GetLastInputVector(), bDrawDebug);
 	}
 }
 

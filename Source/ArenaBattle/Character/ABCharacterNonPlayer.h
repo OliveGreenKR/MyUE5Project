@@ -46,7 +46,7 @@ protected:
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
 
-	void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
+	/*void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;*/
 	void AttackByAI() override;
 private:
 	bool GetAIDrawDebug() override { return bDrawDebug; }
