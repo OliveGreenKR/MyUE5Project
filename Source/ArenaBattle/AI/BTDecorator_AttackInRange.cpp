@@ -8,7 +8,7 @@
 
 UBTDecorator_AttackInRange::UBTDecorator_AttackInRange()
 {
-	NodeName = TEXT("CanAttack");
+	NodeName = TEXT("AttackInRange");
 }
 
 bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const

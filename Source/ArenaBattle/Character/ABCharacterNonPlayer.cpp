@@ -103,7 +103,7 @@ void AABCharacterNonPlayer::AttackByAI()
 		SkillParameters OutSkillParams = SkillParameters();
 		FABCharacterStat TotalStat = Stat->GetTotalStat();
 
-		OutSkillParams.SkillDamageModifier =  bDrawDebug ? 30.0f : TotalStat.Attack;
+		OutSkillParams.SkillDamageModifier =  bDrawDebug ? 0.0f : TotalStat.Attack;
 
 		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
