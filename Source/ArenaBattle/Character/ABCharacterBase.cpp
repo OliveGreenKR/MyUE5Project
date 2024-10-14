@@ -129,8 +129,22 @@ void AABCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-#pragma region Redirection
+#pragma region Manual Redirection
+	if (bManualReDireciton)
+	{
+		if (ManualDirection.IsNearlyZero(KINDA_SMALL_NUMBER))
+		{
+			bManualReDireciton = false;
+		}
 
+		FRotator TargetRot = FRotationMatrix::MakeFromX(ManualDirection).Rotator();
+		SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, ManualTurnInterpSpeed));
+
+		if(GetActorRotation().Equals(TargetRot, KINDA_SMALL_NUMBER))
+		{
+			bManualReDireciton = false;
+		}
+	}
 #pragma endregion 
 	
 #pragma region Debug

@@ -63,6 +63,9 @@ protected:
 	void QuaterMove(const FInputActionValue& Value);
 	void Attack();
 
+// Skill 
+private:
+	void SetSkillDiretion();
 
 protected:
 	ECharacterControlType CurrentCharacterControlType;

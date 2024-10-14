@@ -6,8 +6,10 @@
 #include "UObject/Interface.h"
 #include "ABSkillExecutorInterface.generated.h"
 
-DECLARE_DELEGATE(FOnCharacterSkillEndDelegate);
-DECLARE_DELEGATE(FOnCharacterSkillBeginDelegate);
+DECLARE_DELEGATE(FOnSkillEndDelegate);
+DECLARE_DELEGATE(FOnSkillBeginDelegate);
+DECLARE_MULTICAST_DELEGATE(FWhenSkillSequenceBegin)
+DECLARE_MULTICAST_DELEGATE(FWhenSkillSequenceEnd)
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -40,6 +42,8 @@ public:
 	virtual void CancelSkill() = 0;
 	virtual const float GetSkillRange() const = 0;
 
-	FOnCharacterSkillEndDelegate OnSkillEnd;
-	FOnCharacterSkillBeginDelegate OnSkillBegin;
+	FOnSkillEndDelegate OnSkillEnd;
+	FOnSkillBeginDelegate OnSkillBegin;
+	FWhenSkillSequenceBegin OnSkillSeqBegin;
+	FWhenSkillSequenceEnd OnSkillSeqEnd;
 };

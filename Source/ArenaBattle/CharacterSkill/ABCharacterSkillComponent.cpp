@@ -107,6 +107,7 @@ void UABCharacterSkillComponent::SkillEnd()
 
 void UABCharacterSkillComponent::SetComboCheckTimer()
 {
+	OnSkillSeqBegin.Broadcast();
 	int32 ComboIndex = GetCurrentCombo() - 1;
 	UABComboActionData* ComboActionData = SkillData->ComboActionData;
 	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
@@ -123,6 +124,7 @@ void UABCharacterSkillComponent::SetComboCheckTimer()
 
 void UABCharacterSkillComponent::CheckSkillCombo()
 {
+	OnSkillSeqEnd.Broadcast();
 	ComboTimerHandle.Invalidate();
 	//Check Next Command
 	if (bHasNextComboCommand)
@@ -136,7 +138,7 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
 		AnimInstance->Montage_SetPlayRate(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
 		SetComboCheckTimer();
-		
+
 		bHasNextComboCommand = false;
 	}
 }

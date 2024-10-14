@@ -208,8 +208,23 @@ void AABCharacterPlayer::Attack()
 		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
 		BasicSkillComponent->OnSkillBegin.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None); });
 		BasicSkillComponent->OnSkillEnd.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking); });
+		if (!BasicSkillComponent->OnSkillSeqBegin.IsBoundToObject(this))
+		{
+			BasicSkillComponent->OnSkillSeqBegin.AddUObject(this, &AABCharacterPlayer::SetSkillDiretion);
+		}
+		if (!BasicSkillComponent->OnSkillSeqEnd.IsBoundToObject(this))
+		{
+			BasicSkillComponent->OnSkillSeqEnd.AddUObject(this, &AABCharacterPlayer::EndManualDirection);
+		}
 		BasicSkillComponent->ExecuteSkill(OutSkillParams, bDrawDebug);
 	}
+}
+
+void AABCharacterPlayer::SetSkillDiretion()
+{
+	ManualTurnInterpSpeed = 8.0f;
+	StartManualDirection();
+	SetManualDirection(GetCharacterMovement()->GetLastInputVector());
 }
 
 

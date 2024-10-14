@@ -50,6 +50,24 @@ protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
 
+#pragma region Manual Redireciton
+
+protected :
+	void SetManualDirection(const FVector& InDirection) 
+	{
+		ManualDirection = InDirection.GetSafeNormal2D(SMALL_NUMBER, GetActorForwardVector()); 
+	}
+
+	FORCEINLINE void StartManualDirection() { bManualReDireciton = true; }
+	FORCEINLINE void EndManualDirection() { bManualReDireciton = false; ManualDirection = FVector::ZeroVector; }
+
+	float ManualTurnInterpSpeed = 4.0f;
+private:
+	FVector ManualDirection = FVector::ZeroVector;
+	bool bManualReDireciton : 1 = false;
+#pragma endregion
+
+
 #pragma region Skill Components
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
