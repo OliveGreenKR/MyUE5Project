@@ -34,6 +34,7 @@ public:
 		float SkillDamageModifier = 0.0f;
 		float SkillDamageMultiplier = 1.0f;
 	};
+
 public:
 	virtual void ExecuteSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug = false) = 0;
 	virtual void CancelSkill() = 0;

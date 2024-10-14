@@ -25,14 +25,13 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	FAICharacterAttackFinished OnAttackFinished;
-	OnAttackFinished.BindLambda(
-		[&]()
-		{
-			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		}
-	);
-
+	//FAICharacterAttackFinished OnAttackFinished;
+	//OnAttackFinished.BindLambda(
+	//	[&]()
+	//	{
+	//		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	//	}
+	//);
 	//Task Start
 	//AIPawn->SetAIAttackDelegate(OnAttackFinished);
 	AIPawn->AttackByAI();

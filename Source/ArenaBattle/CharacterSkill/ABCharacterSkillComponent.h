@@ -46,7 +46,9 @@ protected:
 
 private:
 	void SkillBegin();
+	//for Montage Delegate Binding
 	void SkillEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	void SkillEnd();
 	void SetComboCheckTimer();
 	virtual void CheckSkillCombo();
 

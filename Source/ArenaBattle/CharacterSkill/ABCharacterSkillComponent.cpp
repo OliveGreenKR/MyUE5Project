@@ -31,6 +31,13 @@ void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillPara
 
 void UABCharacterSkillComponent::CancelSkill()
 {
+	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+	
+	AnimInstance->Montage_Stop(0.2f, SkillData->SkillMontage);
+
+	GetWorld()->GetTimerManager().ClearTimer(ComboTimerHandle);
+	bHasNextComboCommand = false;
+	SkillEnd();
 }
 
 const float UABCharacterSkillComponent::GetSkillRange() const
@@ -113,6 +120,11 @@ void UABCharacterSkillComponent::SkillBegin()
 }
 
 void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	SkillEnd();
+}
+
+void UABCharacterSkillComponent::SkillEnd()
 {
 	//character move
 	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
