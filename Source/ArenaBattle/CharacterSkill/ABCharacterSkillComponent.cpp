@@ -54,8 +54,7 @@ void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	{
 		FRotator CurrentRotation = GetOwner()->GetActorRotation();
 		FRotator DesiredRotation = ComboDirection.Rotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f);
-		GetOwner()->SetActorRotation(NewRotation);
+		GetOwner()->SetActorRotation(FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f));
 
 		//end rotate
 		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
