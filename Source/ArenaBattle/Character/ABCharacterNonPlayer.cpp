@@ -107,6 +107,7 @@ void AABCharacterNonPlayer::AttackByAI()
 
 		BasicSkillComponent->OnSkillBegin.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None); });
 		BasicSkillComponent->OnSkillEnd.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking); });
+
 		BasicSkillComponent->ExecuteSkill(OutSkillParams, bDrawDebug);
 	}
 }
