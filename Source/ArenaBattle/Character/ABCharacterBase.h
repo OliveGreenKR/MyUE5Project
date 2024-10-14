@@ -51,7 +51,6 @@ protected:
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
 
 #pragma region Manual Redireciton
-
 protected :
 	void SetManualDirection(const FVector& InDirection) 
 	{

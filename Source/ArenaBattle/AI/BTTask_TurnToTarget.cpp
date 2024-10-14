@@ -17,8 +17,9 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	APawn* ControllingPawn = Cast<APawn>(OwnerComp.GetAIOwner()->GetPawn());
-	if (ControllingPawn->IsValidLowLevelFast())
+	if (!ControllingPawn->IsValidLowLevelFast())
 	{
+		DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), 50.0f, 16, FColor::Red);
 		return EBTNodeResult::Failed;
 	}
 
@@ -36,9 +37,9 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 
 	float TurnSpeed = AIPawn->GetAITurnSpeed();
 	FVector LookVector = TargetPawn->GetActorLocation() - ControllingPawn->GetActorLocation();
-	LookVector.Z = 0.0f;
+	LookVector.Z = 0;
 	FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 	ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), TurnSpeed));
-
+	
 	return EBTNodeResult::Succeeded;
 }

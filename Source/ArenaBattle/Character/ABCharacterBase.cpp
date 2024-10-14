@@ -189,7 +189,6 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	return InTrueDamage;
 }
-
 const int32 AABCharacterBase::GetLevel()
 {
 	return Stat->GetCurrentLevel();

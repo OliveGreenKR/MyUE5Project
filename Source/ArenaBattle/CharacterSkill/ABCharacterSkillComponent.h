@@ -61,13 +61,13 @@ public:
 	
 
 protected:
-	FORCEINLINE const float GetNextSkillAttackRange() const { return GetSkillRange(CurrentCombo); }
+	FORCEINLINE const float GetNextSkillHitRange() const { return GetSkillHitRange(CurrentCombo); }
 	FORCEINLINE const FCollisionShape GetCurrentSkillShape() const { return GetSkillShape(CurrentCombo - 1); }
 	const float GetCurrentSkillSpeedRate() const;
-	FORCEINLINE const float GetCurrentSkillRange() const { return GetSkillRange(CurrentCombo - 1); }
+	FORCEINLINE const float GetCurrentSkillHitRange() const { return GetSkillHitRange(CurrentCombo - 1); }
 private:
 	const FCollisionShape GetSkillShape(int32 SkillIdx) const;
-	const float GetSkillRange(int32 SkillIdx) const;
+	const float GetSkillHitRange(int32 SkillIdx) const;
 #pragma endregion
 
 protected:

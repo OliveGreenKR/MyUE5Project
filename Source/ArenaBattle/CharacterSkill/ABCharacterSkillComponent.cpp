@@ -41,7 +41,7 @@ void UABCharacterSkillComponent::CancelSkill()
 
 const float UABCharacterSkillComponent::GetSkillRange() const
 {
-	return GetNextSkillAttackRange();
+	return OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius()+ GetNextSkillHitRange();
 }
 
 void UABCharacterSkillComponent::OnRegister()
@@ -148,13 +148,15 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	TArray<FHitResult> OutHitResults;
 	//tag :Attack
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, GetOwner());
+
 	const FVector SkillDirection = GetOwner()->GetActorForwardVector();
 	const FSkillDataPerMotion& NowMotionData = SkillData->GetSkillMotionData(GetCurrentCombo() - 1);
+
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(SkillDirection, FVector::UpVector).ToQuat(); //forward to unit:x
 	const FVector Start = GetOwner()->GetActorLocation() +
 		SkillDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FCollisionShape CollisionShape = GetCurrentSkillShape();
-	const FVector End = GetOwner()->GetActorLocation() + SkillDirection * GetCurrentSkillRange();
+	const FVector End = GetOwner()->GetActorLocation() + SkillDirection * GetCurrentSkillHitRange();
 
 	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)
@@ -219,7 +221,7 @@ const FCollisionShape UABCharacterSkillComponent::GetSkillShape(int32 SkillIdx) 
 	return SkillData->GetCollisionShape(SkillIdx, FVector3f(LastSkillParams.SkillRangeForwardModifier, 0, 0), LastSkillParams.SkillExtentRate);
 }
 
-const float UABCharacterSkillComponent::GetSkillRange(int32 SkillIdx) const
+const float UABCharacterSkillComponent::GetSkillHitRange(int32 SkillIdx) const
 {
 	return OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius()
 		+ GetSkillShape(SkillIdx).GetExtent().X;

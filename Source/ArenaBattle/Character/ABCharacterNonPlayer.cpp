@@ -1,6 +1,7 @@
 #include "Character/ABCharacterNonPlayer.h"
 #include "Engine/AssetManager.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "AI/ABAIController.h"
 
@@ -103,7 +104,9 @@ void AABCharacterNonPlayer::AttackByAI()
 		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
 		OutSkillParams.SkillSpeedRate = bDrawDebug ? 0.85f * TotalStat.AttackSpeedRate : TotalStat.AttackSpeedRate;
-		
+
+		BasicSkillComponent->OnSkillBegin.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None); });
+		BasicSkillComponent->OnSkillEnd.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking); });
 		BasicSkillComponent->ExecuteSkill(OutSkillParams, bDrawDebug);
 	}
 }
