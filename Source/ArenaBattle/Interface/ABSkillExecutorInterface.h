@@ -36,9 +36,8 @@ public:
 	};
 
 public:
-	virtual void ExecuteSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug = false) = 0;
+	virtual void ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug = false) = 0;
 	virtual void CancelSkill() = 0;
-	virtual void ForcelySetSkillDirection(FVector InDesiredDirection) = 0;
 	virtual const float GetSkillRange() const = 0;
 
 	FOnCharacterSkillEndDelegate OnSkillEnd;

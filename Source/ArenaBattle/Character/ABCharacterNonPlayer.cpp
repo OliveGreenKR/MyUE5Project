@@ -104,7 +104,7 @@ void AABCharacterNonPlayer::AttackByAI()
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
 		OutSkillParams.SkillSpeedRate = bDrawDebug ? 0.85f * TotalStat.AttackSpeedRate : TotalStat.AttackSpeedRate;
 		
-		BasicSkillComponent->ExecuteSkill(OutSkillParams, GetLastMovementInputVector(), bDrawDebug);
+		BasicSkillComponent->ExecuteSkill(OutSkillParams, bDrawDebug);
 	}
 }
 

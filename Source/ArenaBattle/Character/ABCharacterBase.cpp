@@ -128,6 +128,10 @@ void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* In
 void AABCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+#pragma region Redirection
+
+#pragma endregion 
 	
 #pragma region Debug
 	if (bDrawDebug)

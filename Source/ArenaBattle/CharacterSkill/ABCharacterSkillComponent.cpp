@@ -4,7 +4,6 @@
 #include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Animation/AnimMontage.h"
 #include "Character/ABComboActionData.h"
@@ -15,7 +14,7 @@
 // Sets default values for this component's properties
 UABCharacterSkillComponent::UABCharacterSkillComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	static ConstructorHelpers::FObjectFinder<UABSkillData> SkillDataRef(TEXT("/Script/ArenaBattle.ABSkillData'/Game/ArenaBattle/Skill/ABS_BasicSwordSkill.ABS_BasicSwordSkill'"));
 	if (SkillDataRef.Object)
@@ -24,9 +23,9 @@ UABCharacterSkillComponent::UABCharacterSkillComponent()
 	}
 }
 
-void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug)
+void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug)
 {
-	ProcessSkill(InSkillParams, DesiredDiretion, DrawDebug);
+	ProcessSkill(InSkillParams, DrawDebug);
 }
 
 void UABCharacterSkillComponent::CancelSkill()
@@ -45,44 +44,22 @@ const float UABCharacterSkillComponent::GetSkillRange() const
 	return GetNextSkillAttackRange();
 }
 
-void UABCharacterSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	//redirecting to ComboDireciton
-	if (bIsRedirectioning)
-	{
-		FRotator CurrentRotation = GetOwner()->GetActorRotation();
-		FRotator DesiredRotation = ComboDirection.Rotation();
-		GetOwner()->SetActorRotation(FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, 8.0f));
-
-		//end rotate
-		if (FMath::Abs((DesiredRotation - CurrentRotation).Yaw) < 0.1f)
-		{
-			bIsRedirectioning = false;
-			GetOwner()->SetActorRotation(DesiredRotation);
-		}
-	}
-
-}
-
 void UABCharacterSkillComponent::OnRegister()
 {
 	Super::OnRegister();
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 }
 
-void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug)
+void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug)
 {
 	//First
-	if (!IsCombo() && !OwnerCharacter->GetCharacterMovement()->IsFalling())
+	if (!IsCombo())
 	{
 		LastSkillParams = InSkillParams;
 		bDrawDebug = DrawDebug;
 		SkillBegin();
 		return;
 	}
-	LastDesiredDirection = DesiredDiretion;
 	bHasNextComboCommand = ComboTimerHandle.IsValid();
 }
 
@@ -93,16 +70,14 @@ void UABCharacterSkillComponent::SetComboNext()
 
 void UABCharacterSkillComponent::SkillBegin()
 {
+	OnSkillBegin.ExecuteIfBound();
+
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
 
 	CurrentCombo = 1;
 	
 	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
-	
-	//character stop
-	Movement->SetMovementMode(EMovementMode::MOVE_None);
-	SetSkilDirectionToDesired();
 
 	//TimerSet
 	ComboTimerHandle.Invalidate();
@@ -115,7 +90,6 @@ void UABCharacterSkillComponent::SkillBegin()
 	FOnMontageEnded EndDeligate;
 	EndDeligate.BindUObject(this, &UABCharacterSkillComponent::SkillEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillData->SkillMontage);
-	OnSkillBegin.ExecuteIfBound();
 }
 
 void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
@@ -125,10 +99,6 @@ void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsPr
 
 void UABCharacterSkillComponent::SkillEnd()
 {
-	//character move
-	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
-	Movement->SetMovementMode(EMovementMode::MOVE_Walking);
-
 	ensure(CurrentCombo != 0);
 	ResetCombo();
 	bDrawDebug = false;
@@ -167,16 +137,8 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 		AnimInstance->Montage_SetPlayRate(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
 		SetComboCheckTimer();
 		
-		//Skill Redirection to Desired
-		SetSkilDirectionToDesired();
 		bHasNextComboCommand = false;
 	}
-}
-
-void UABCharacterSkillComponent::SetSkilDirectionToDesired()
-{
-	ComboDirection = LastDesiredDirection.GetSafeNormal(UE_SMALL_NUMBER,GetOwner()->GetActorForwardVector());
-	bIsRedirectioning = true;
 }
 
 void UABCharacterSkillComponent::PerformSkillHitCheck()
@@ -184,13 +146,13 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	TArray<FHitResult> OutHitResults;
 	//tag :Attack
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, GetOwner());
-
+	const FVector SkillDirection = GetOwner()->GetActorForwardVector();
 	const FSkillDataPerMotion& NowMotionData = SkillData->GetSkillMotionData(GetCurrentCombo() - 1);
-	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(ComboDirection, FVector::UpVector).ToQuat(); //forward to unit:x
+	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(SkillDirection, FVector::UpVector).ToQuat(); //forward to unit:x
 	const FVector Start = GetOwner()->GetActorLocation() +
-		ComboDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
+		SkillDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FCollisionShape CollisionShape = GetCurrentSkillShape();
-	const FVector End = GetOwner()->GetActorLocation() + ComboDirection * GetCurrentSkillRange();
+	const FVector End = GetOwner()->GetActorLocation() + SkillDirection * GetCurrentSkillRange();
 
 	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)

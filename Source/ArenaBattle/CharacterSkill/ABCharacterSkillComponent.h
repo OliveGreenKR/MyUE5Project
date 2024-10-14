@@ -18,30 +18,23 @@ public:
 
 	UABCharacterSkillComponent();
 
-
-
 protected:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void OnRegister() override;
 
-#pragma region SkillExecution
+#pragma region SkillExecutions
 public:
 public:
 	//Inherited IABSkillExecutionInterface
-	virtual void ExecuteSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug = false) override;
+	virtual void ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug = false) override;
 	virtual void CancelSkill() override;
 	virtual const float GetSkillRange() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Combo")
-	void ForcelySetSkillDirection(FVector InDesiredDirection) override { ComboDirection = InDesiredDirection; }
-
 
 	FORCEINLINE bool IsCombo() const		{ return (CurrentCombo > 0); }
 	FORCEINLINE int32 GetCurrentCombo()		{ return CurrentCombo; }
 	FORCEINLINE void ResetCombo()			{ CurrentCombo = 0; }
 
 protected:
-	void ProcessSkill(const SkillParameters& InSkillParams, FVector DesiredDiretion, bool DrawDebug = false);
+	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
 	void SetComboNext();
 
 private:
@@ -52,18 +45,11 @@ private:
 	void SetComboCheckTimer();
 	virtual void CheckSkillCombo();
 
-	void SetSkilDirectionToDesired();
-
 private:
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
 
 	bool bHasNextComboCommand = false;
-
-	//Normalized. When ComboMontage Begins, try to rotate to this.
-	FVector ComboDirection;
-	FVector LastDesiredDirection;
-	bool bIsRedirectioning : 1 = false;
 	SkillParameters LastSkillParams = SkillParameters();
 
 	TObjectPtr<class ACharacter> OwnerCharacter;
