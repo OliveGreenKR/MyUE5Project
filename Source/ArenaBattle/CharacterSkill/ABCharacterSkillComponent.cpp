@@ -88,11 +88,11 @@ void UABCharacterSkillComponent::SkillBegin()
 
 	//Set Montage End Deligate
 	FOnMontageEnded EndDeligate;
-	EndDeligate.BindUObject(this, &UABCharacterSkillComponent::SkillEnd);
+	EndDeligate.BindUObject(this, &UABCharacterSkillComponent::OnSkillMontageEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillData->SkillMontage);
 }
 
-void UABCharacterSkillComponent::SkillEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+void UABCharacterSkillComponent::OnSkillMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	SkillEnd();
 }

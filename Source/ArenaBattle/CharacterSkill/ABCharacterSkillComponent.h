@@ -29,9 +29,9 @@ public:
 	virtual void CancelSkill() override;
 	virtual const float GetSkillRange() const;
 
-	FORCEINLINE bool IsCombo() const		{ return (CurrentCombo > 0); }
-	FORCEINLINE int32 GetCurrentCombo()		{ return CurrentCombo; }
-	FORCEINLINE void ResetCombo()			{ CurrentCombo = 0; }
+	FORCEINLINE const bool IsCombo() const		{ return (CurrentCombo > 0); }
+	FORCEINLINE const int32 GetCurrentCombo()	{ return CurrentCombo; }
+	FORCEINLINE void ResetCombo()				{ CurrentCombo = 0; }
 
 protected:
 	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
@@ -39,10 +39,10 @@ protected:
 
 private:
 	void SkillBegin();
-	//for Montage Delegate Binding
-	void SkillEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-	void SkillEnd();
-	void SetComboCheckTimer();
+
+	virtual void OnSkillMontageEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void SkillEnd();
+	virtual void SetComboCheckTimer();
 	virtual void CheckSkillCombo();
 
 private:
