@@ -30,13 +30,11 @@ void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillPara
 
 void UABCharacterSkillComponent::CancelSkill()
 {
-	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-	
-	AnimInstance->Montage_Stop(0.2f, SkillData->SkillMontage);
-
-	GetWorld()->GetTimerManager().ClearTimer(ComboTimerHandle);
-	bHasNextComboCommand = false;
-	SkillEnd();
+	if (IsCombo())
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Stop(1.0f, SkillData->SkillMontage);
+	}
 }
 
 const float UABCharacterSkillComponent::GetSkillRange() const
@@ -53,7 +51,7 @@ void UABCharacterSkillComponent::OnRegister()
 void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug)
 {
 	//First
-	if (!IsCombo())
+	if (!IsSkillCoolDown() && !IsCombo())
 	{
 		LastSkillParams = InSkillParams;
 		bDrawDebug = DrawDebug;
@@ -81,7 +79,9 @@ void UABCharacterSkillComponent::SkillBegin()
 
 	//TimerSet
 	ComboTimerHandle.Invalidate();
+	CoolDownTimerHandle.Invalidate();
 	SetComboCheckTimer();
+	SetCoolDownTimer();
 
 	//Play Anim
 	AnimInstance->Montage_Play(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
@@ -99,9 +99,10 @@ void UABCharacterSkillComponent::OnSkillMontageEnd(UAnimMontage* TargetMontage, 
 
 void UABCharacterSkillComponent::SkillEnd()
 {
-	ensure(CurrentCombo != 0);
 	ResetCombo();
+	bHasNextComboCommand = false;
 	bDrawDebug = false;
+	GetWorld()->GetTimerManager().ClearTimer(ComboTimerHandle);
 	OnSkillEnd.ExecuteIfBound();
 }
 
@@ -120,6 +121,18 @@ void UABCharacterSkillComponent::SetComboCheckTimer()
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UABCharacterSkillComponent::CheckSkillCombo, ComboEffectiveTime, false);
+}
+
+void UABCharacterSkillComponent::SetCoolDownTimer()
+{
+	const float skillCoolTime = SkillData->SkillCoolTime;
+
+	if (skillCoolTime < 0)
+	{
+		return;
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(CoolDownTimerHandle, this, &UABCharacterSkillComponent::OnCoolDownEnd, skillCoolTime, false);
 }
 
 void UABCharacterSkillComponent::CheckSkillCombo()
@@ -141,6 +154,11 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 
 		bHasNextComboCommand = false;
 	}
+}
+
+void UABCharacterSkillComponent::OnCoolDownEnd()
+{
+	CoolDownTimerHandle.Invalidate();
 }
 
 void UABCharacterSkillComponent::PerformSkillHitCheck()

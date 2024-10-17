@@ -32,7 +32,7 @@ public:
 	FORCEINLINE const bool IsCombo() const		{ return (CurrentCombo > 0); }
 	FORCEINLINE const int32 GetCurrentCombo()	{ return CurrentCombo; }
 	FORCEINLINE void ResetCombo()				{ CurrentCombo = 0; }
-
+	FORCEINLINE const bool IsSkillCoolDown()    { return CoolDownTimerHandle.IsValid(); }
 protected:
 	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
 	void SetComboNext();
@@ -40,14 +40,17 @@ protected:
 private:
 	void SkillBegin();
 
-	virtual void OnSkillMontageEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-	virtual void SkillEnd();
-	virtual void SetComboCheckTimer();
-	virtual void CheckSkillCombo();
+	void OnSkillMontageEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	void SkillEnd();
+	void SetComboCheckTimer();
+	void SetCoolDownTimer();
+	void CheckSkillCombo();
+	void OnCoolDownEnd();
 
 private:
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
+	FTimerHandle CoolDownTimerHandle;
 
 	bool bHasNextComboCommand = false;
 	SkillParameters LastSkillParams = SkillParameters();

@@ -187,6 +187,8 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		DrawDebugString(GetWorld(), TopOfCapsule, DebugText, nullptr, DebugColor, 1.f, true, 3.0f);
 	}
 
+	BasicSkillComponent->CancelSkill();
+
 	return InTrueDamage;
 }
 const int32 AABCharacterBase::GetLevel()
