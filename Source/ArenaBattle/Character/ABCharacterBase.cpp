@@ -186,7 +186,7 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		FString DebugText = FString::Printf(TEXT("Taken Damage : %.3f "), DamageAmount);
 		DrawDebugString(GetWorld(), TopOfCapsule, DebugText, nullptr, DebugColor, 1.f, true, 3.0f);
 	}
-
+	//for cancel test
 	BasicSkillComponent->CancelSkill();
 
 	return InTrueDamage;
