@@ -25,7 +25,10 @@ UABCharacterSkillComponent::UABCharacterSkillComponent()
 
 void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug)
 {
-	ProcessSkill(InSkillParams, DrawDebug);
+	if (IsActive())
+	{
+		ProcessSkill(InSkillParams, DrawDebug);
+	}
 }
 
 void UABCharacterSkillComponent::CancelSkill()

@@ -4,6 +4,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "AI/ABAIController.h"
+#include "NavigationSystem.h"
 
 AABCharacterNonPlayer::AABCharacterNonPlayer()
 {
@@ -42,6 +43,11 @@ void AABCharacterNonPlayer::SetDead()
 		return;
 
 	Super::SetDead();
+
+	if (AABAIController* AIController = Cast<AABAIController>(Controller))
+	{
+		AIController->StopAI();
+	}
 	
 	FTimerHandle DeadTimerHandle;
 
@@ -79,22 +85,21 @@ float AABCharacterNonPlayer::GetAIDetectRange()
 
 float AABCharacterNonPlayer::GetAIAttackRange()
 {
-	float ret = 0.0f;
 	if (BasicSkillComponent)
 	{
-		ret = BasicSkillComponent->GetSkillRange();
+		return BasicSkillComponent->GetSkillRange();
 	}
-	return ret;
+	return 0.0f;
 }
 
 float AABCharacterNonPlayer::GetAITurnSpeed()
 {
-	return 5.0f;
+	return 3.0f;
 }
 
 void AABCharacterNonPlayer::AttackByAI()
 {
-	if (BasicSkillComponent && BasicSkillComponent->IsActive())
+	if (BasicSkillComponent)
 	{
 		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
 
