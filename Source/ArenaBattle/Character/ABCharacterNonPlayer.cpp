@@ -23,6 +23,8 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 	NPCMeshHandle = UAssetManager::Get().GetStreamableManager().
 		RequestAsyncLoad(NPCMeshes[RandIndex], FStreamableDelegate::CreateUObject(this, &AABCharacterNonPlayer::NPCMeshLoadCompleted));
 
+	BasicSkillComponent->Activate();
+
 	if (bIsDummy)
 	{
 		AIControllerClass = nullptr;
@@ -87,12 +89,12 @@ float AABCharacterNonPlayer::GetAIAttackRange()
 
 float AABCharacterNonPlayer::GetAITurnSpeed()
 {
-	return 2.0f;
+	return 5.0f;
 }
 
 void AABCharacterNonPlayer::AttackByAI()
 {
-	if (BasicSkillComponent)
+	if (BasicSkillComponent && BasicSkillComponent->IsActive())
 	{
 		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
 
@@ -114,7 +116,7 @@ void AABCharacterNonPlayer::AttackByAI()
 
 void AABCharacterNonPlayer::StopAttackByAI()
 {
-	if (BasicSkillComponent)
+	if (BasicSkillComponent && BasicSkillComponent->IsActive())
 	{
 		BasicSkillComponent->CancelSkill();
 	}

@@ -232,6 +232,11 @@ void AABCharacterBase::DrawDebugdArrow(FVector InDirection, float InSeconds, FCo
 
 void AABCharacterBase::SetDead()
 {
+	if (BasicSkillComponent)
+	{
+		BasicSkillComponent->CancelSkill();
+		BasicSkillComponent->Deactivate();
+	}
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);

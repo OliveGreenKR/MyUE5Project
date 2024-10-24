@@ -195,7 +195,7 @@ void AABCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 
 void AABCharacterPlayer::Attack()
 {
-	if (!GetCharacterMovement()->IsFalling() && BasicSkillComponent )
+	if (!GetCharacterMovement()->IsFalling() && BasicSkillComponent && BasicSkillComponent->IsActive())
 	{
 		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
 

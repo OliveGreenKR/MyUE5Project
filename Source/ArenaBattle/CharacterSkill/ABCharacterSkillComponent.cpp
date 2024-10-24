@@ -30,7 +30,7 @@ void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillPara
 
 void UABCharacterSkillComponent::CancelSkill()
 {
-	if (IsCombo())
+	if (IsCombo()&& isCancelable)
 	{
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Stop(1.0f, SkillData->SkillMontage);
@@ -46,6 +46,11 @@ void UABCharacterSkillComponent::OnRegister()
 {
 	Super::OnRegister();
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
+}
+
+void UABCharacterSkillComponent::SetCancelable(const bool InBool)
+{
+	isCancelable = InBool;
 }
 
 void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug)

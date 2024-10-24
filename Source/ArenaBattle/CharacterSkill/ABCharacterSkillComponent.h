@@ -23,7 +23,6 @@ protected:
 
 #pragma region SkillExecutions
 public:
-public:
 	//Inherited IABSkillExecutionInterface
 	virtual void ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug = false) override;
 	virtual void CancelSkill() override;
@@ -33,6 +32,9 @@ public:
 	FORCEINLINE const int32 GetCurrentCombo()	{ return CurrentCombo; }
 	FORCEINLINE void ResetCombo()				{ CurrentCombo = 0; }
 	FORCEINLINE const bool IsSkillCoolDown()    { return CoolDownTimerHandle.IsValid(); }
+
+	UFUNCTION(BlueprintCallable)
+	void SetCancelable(const bool InBool); 
 protected:
 	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
 	void SetComboNext();
@@ -51,6 +53,7 @@ private:
 	void OnComboTimerEnd();
 
 private: 
+	bool isCancelable : 1 = true;
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
 	FTimerHandle ComboIgnoreTimerHandle;
