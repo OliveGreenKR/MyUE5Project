@@ -46,10 +46,14 @@ private:
 	void SetCoolDownTimer();
 	void CheckSkillCombo();
 	void OnCoolDownEnd();
+	UFUNCTION()
+	void OnComboIgnoreEnd(float ComboEffectiveTime);
+	void OnComboTimerEnd();
 
-private:
+private: 
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
+	FTimerHandle ComboIgnoreTimerHandle;
 	FTimerHandle CoolDownTimerHandle;
 
 	bool bHasNextComboCommand = false;
