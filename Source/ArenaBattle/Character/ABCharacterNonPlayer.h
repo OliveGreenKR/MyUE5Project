@@ -48,6 +48,7 @@ protected:
 
 	/*void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;*/
 	void AttackByAI() override;
+	void StopAttackByAI() override;
 private:
 	bool GetAIDrawDebug() override { return bDrawDebug; }
 #pragma endregion

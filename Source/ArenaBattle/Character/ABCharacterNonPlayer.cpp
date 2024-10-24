@@ -112,3 +112,11 @@ void AABCharacterNonPlayer::AttackByAI()
 	}
 }
 
+void AABCharacterNonPlayer::StopAttackByAI()
+{
+	if (BasicSkillComponent)
+	{
+		BasicSkillComponent->CancelSkill();
+	}
+}
+
