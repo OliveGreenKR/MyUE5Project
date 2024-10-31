@@ -8,6 +8,7 @@
 UABCharacterStatComponent::UABCharacterStatComponent()
 {
 	CurrentLevel = 1;
+	bWantsInitializeComponent = true;
 }
 
 void UABCharacterStatComponent::SetLevelStat(int32 InNewLevel)
@@ -41,10 +42,9 @@ void UABCharacterStatComponent::SetCurrentHp(float NewHp)
 	OnHpChanged.Broadcast(CurrentHp);
 }
 
-// Called when the game starts
-void UABCharacterStatComponent::BeginPlay()
+void UABCharacterStatComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	SetLevelStat(CurrentLevel);
 	SetCurrentHp(GetTotalStat().MaxHp);

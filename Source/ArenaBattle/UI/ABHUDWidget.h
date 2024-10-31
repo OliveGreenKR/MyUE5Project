@@ -13,5 +13,10 @@ UCLASS()
 class ARENABATTLE_API UABHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	UABHUDWidget(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	virtual void NativeConstruct() override;
 };

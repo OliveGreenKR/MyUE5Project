@@ -34,8 +34,9 @@ public:
 protected:
 	//CurrentHp must be set by this function. forcely set Hp in range [0:MaxHp]
 	void SetCurrentHp(float NewHp);
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 
+protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentHp;
 
