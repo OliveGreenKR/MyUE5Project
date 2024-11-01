@@ -4,30 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ABHUDWidget.generated.h"
+#include "ABCharacterStatWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ARENABATTLE_API UABHUDWidget : public UUserWidget
+class ARENABATTLE_API UABCharacterStatWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
-	UABHUDWidget(const FObjectInitializer& ObjectInitializer);
-
+	
 protected:
 	virtual void NativeConstruct() override;
 
 public:
 	void UpdateStat(const struct FABCharacterStat& BaseStat, const struct FABCharacterStat& ModifierStat);
-	void UpdateHpBar(float NewCurrentHp);
-
-protected:
-	UPROPERTY()
-	TObjectPtr<class UABHpBarWidget> HpBar;
-
-	UPROPERTY()
-	TObjectPtr<class UABCharacterStatWidget> CharacterStat;
 };

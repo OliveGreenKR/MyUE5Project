@@ -75,7 +75,7 @@ protected:
 
 #pragma region Stat Component
 public :
-	const class UABCharacterStatComponent* GetStat() { return Stat; }
+	FORCEINLINE class UABCharacterStatComponent* GetStat() { return Stat; }
 	const int32 GetLevel();
 	void SetLevel(int32 InNewLevel);
 

@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Character/ABCharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/ABCharacterHUDInterface.h"
 #include "ABCharacterPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ARENABATTLE_API AABCharacterPlayer : public AABCharacterBase
+class ARENABATTLE_API AABCharacterPlayer : public AABCharacterBase, public IABCharacterHUDInterface
 {
 	GENERATED_BODY()
 
@@ -63,13 +64,16 @@ protected:
 	void QuaterMove(const FInputActionValue& Value);
 	void Attack();
 
+protected:
+	ECharacterControlType CurrentCharacterControlType;
+
 // Skill 
 private:
 	void SetSkillDiretion();
 
+
+// UI
 protected:
-	ECharacterControlType CurrentCharacterControlType;
+	virtual void SetupHUDWidget(class UABHUDWidget* InHUDWidget);
 
-
-	
 };

@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CharacterSkill/ABCharacterSkillComponent.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "UI/ABHUDWidget.h"
 
 AABCharacterPlayer::AABCharacterPlayer()
 {
@@ -225,6 +226,19 @@ void AABCharacterPlayer::SetSkillDiretion()
 	ManualTurnInterpSpeed = 8.0f;
 	StartManualDirection();
 	SetManualDirection(GetCharacterMovement()->GetLastInputVector());
+}
+
+void AABCharacterPlayer::SetupHUDWidget(UABHUDWidget* InHUDWidget)
+{
+	if (InHUDWidget)
+	{
+		//binding data to HUD Widgets
+		InHUDWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+		InHUDWidget->UpdateHpBar(Stat->GetCurrentHp());
+
+		Stat->OnStatChanged.AddUObject(InHUDWidget, &UABHUDWidget::UpdateStat);
+		Stat->OnHpChanged.AddUObject(InHUDWidget, &UABHUDWidget::UpdateHpBar);
+	}
 }
 
 

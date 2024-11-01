@@ -104,7 +104,7 @@ void AABCharacterNonPlayer::AttackByAI()
 		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
 
 		SkillParameters OutSkillParams = SkillParameters();
-		FABCharacterStat TotalStat = Stat->GetTotalStat();
+		FABCharacterStat TotalStat = GetStat()->GetTotalStat();
 
 		OutSkillParams.SkillDamageModifier =  bDrawDebug ? 0.0f : TotalStat.Attack;
 

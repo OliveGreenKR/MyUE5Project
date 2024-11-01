@@ -9,6 +9,9 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangeedDelegate,
+									 const FABCharacterStat& /*BaseStat*/,
+									 const FABCharacterStat& /*ModifierStat*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENABATTLE_API UABCharacterStatComponent : public UActorComponent
@@ -22,7 +25,10 @@ public:
 public:
 	void SetLevelStat(int32 InNewLevel);
 	FORCEINLINE float GetCurrentLevel() const									{ return CurrentLevel; }
-	FORCEINLINE void SetModifierStat(const FABCharacterStat& InModifierStat)	{ ModifierStat = InModifierStat; }
+	FORCEINLINE void SetModifierStat(const FABCharacterStat& InModifierStat)	{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
+	FORCEINLINE void SetBaseStat(const FABCharacterStat& InBaseStat)			{ BaseStat = InBaseStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
+	FORCEINLINE const FABCharacterStat& GetBaseStat() const						{ return BaseStat; }
+	FORCEINLINE const FABCharacterStat& GetModifierStat() const					{ return ModifierStat; }
 	FORCEINLINE FABCharacterStat GetTotalStat() const							{ return BaseStat + ModifierStat; }
 	FORCEINLINE float GetCurrentHp() const										{ return CurrentHp; }
 	float ApplyDamage(float InDamage);
@@ -30,7 +36,7 @@ public:
 public:
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
-
+	FOnStatChangeedDelegate OnStatChanged;
 protected:
 	//CurrentHp must be set by this function. forcely set Hp in range [0:MaxHp]
 	void SetCurrentHp(float NewHp);
@@ -43,6 +49,7 @@ protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentLevel;
 
+private:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	FABCharacterStat BaseStat;
 
