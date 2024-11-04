@@ -259,9 +259,13 @@ void AABCharacterBase::TakeItem(UABItemData* InItemData)
 
 void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
 {
-	UE_LOG(LogABCharacter, Log, TEXT("Drink Potion"));
+	FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation();
+	float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector CapsuleTopLocation = CapsuleLocation + FVector(0.0f, 0.0f, CapsuleHalfHeight + 30.f);
+	DrawDebugString(GetWorld(), CapsuleTopLocation, TEXT("Potion"), nullptr, FColor::Black , 1.0f, false, 1.5f);
+	
+	//UE_LOG(LogABCharacter, Log, TEXT("Drink Potion"));
 }
-
 void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 {
 	UABWeaponItemData* WeaponItemData = Cast<UABWeaponItemData>(InItemData);
@@ -279,7 +283,12 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
 {
-	UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
+	FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation();
+	float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector CapsuleTopLocation = CapsuleLocation + FVector(0.0f, 0.0f, CapsuleHalfHeight + 30.f);
+	DrawDebugString(GetWorld(), CapsuleTopLocation, TEXT("Scroll"), nullptr, FColor::Black, 1.0f, false, 1.5f);
+
+	//UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
 }
 
 
