@@ -30,4 +30,5 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UABCharacterStatWidget> CharacterStat;
+
 };

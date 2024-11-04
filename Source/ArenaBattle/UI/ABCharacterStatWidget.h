@@ -19,4 +19,15 @@ protected:
 
 public:
 	void UpdateStat(const struct FABCharacterStat& BaseStat, const struct FABCharacterStat& ModifierStat);
+
+
+
+
+private:
+	UPROPERTY()
+	TMap<FName, class UTextBlock*> BaseLookup;
+
+	UPROPERTY()
+	TMap<FName, class UTextBlock*> ModifierLookup;
+
 };

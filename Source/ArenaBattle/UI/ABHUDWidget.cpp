@@ -41,3 +41,4 @@ void UABHUDWidget::UpdateHpBar(float NewCurrentHp)
 {
 	HpBar->UpdateHpBar(NewCurrentHp);
 }
+
