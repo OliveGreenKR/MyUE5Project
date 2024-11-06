@@ -23,6 +23,7 @@ class ARENABATTLE_API UABItemData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
+	//for AssetManager Tags
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override
 	{
 		return FPrimaryAssetId("ABItemData", GetFName());

@@ -22,25 +22,26 @@ public:
 protected:
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
-
+	virtual void SetDead() override;
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+#pragma region Character Control Section
 protected:
-//Character Control Section
 	void ChangeCharacterControl();
 	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
 
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData) override;
+#pragma endregion
+#pragma region Camera Section
 protected:
-// Camera Section
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
-
-	
-// Input Section
+#pragma endregion
+#pragma region  Input Section
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> JumpAction;
 
@@ -66,14 +67,14 @@ protected:
 
 protected:
 	ECharacterControlType CurrentCharacterControlType;
-
-// Skill 
+#pragma endregion
+#pragma region Skill 
 private:
 	void SetSkillDiretion();
 
-
-// UI
+#pragma endregion
+#pragma region UI
 protected:
 	virtual void SetupHUDWidget(class UABHUDWidget* InHUDWidget);
-
+#pragma endregion
 };

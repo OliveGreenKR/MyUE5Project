@@ -67,13 +67,30 @@ AABCharacterPlayer::AABCharacterPlayer()
 void AABCharacterPlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	GetCharacterMovement()->JumpZVelocity = 500.f;  //default =700
 }
 
 void AABCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		EnableInput(PlayerController);
+
+	}
 	SetCharacterControl(CurrentCharacterControlType);
+}
+
+void AABCharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
 }
 
 void AABCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -115,6 +132,7 @@ void AABCharacterPlayer::ChangeCharacterControl()
 
 void AABCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
 {
+	//Load Data Asset From ControlDataMap (Edited in BP)
 	UABCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
 	check(NewCharacterControl);
 

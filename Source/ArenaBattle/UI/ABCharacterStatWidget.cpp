@@ -42,16 +42,19 @@ void UABCharacterStatWidget::UpdateStat(const FABCharacterStat& BaseStat, const 
 		PropIt->GetValue_InContainer((const void*)&ModifierStat, &ModifierData);
 
 
-		UTextBlock** BaseTextBlockPtr = BaseLookup.Find(PropKey);
-		if (BaseTextBlockPtr)
+		UTextBlock** TotalTextBlockPtr = BaseLookup.Find(PropKey);
+		if (TotalTextBlockPtr)
 		{
-			(*BaseTextBlockPtr)->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), BaseData)));
+			float TotalData = BaseData + ModifierData;
+			(*TotalTextBlockPtr)->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), TotalData)));
 		}
 
 		UTextBlock** ModifierTextBlockPtr = ModifierLookup.Find(PropKey);
 		if (ModifierTextBlockPtr)
 		{
-			(*ModifierTextBlockPtr)->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), ModifierData)));
+			FString ModiString = ModifierData >= 0
+				? FString::Printf(TEXT("+%.2f"), ModifierData) : FString::Printf(TEXT("%.2f"), ModifierData);
+			(*ModifierTextBlockPtr)->SetText(FText::FromString(ModiString));
 		}
 	}
 }

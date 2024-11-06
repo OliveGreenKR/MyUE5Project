@@ -14,7 +14,8 @@
 #include "UI/ABWidgetComponent.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
 #include "UI/ABHpBarWidget.h"
-#include "Item/ABWeaponItemData.h"
+#include "Item/ABItems.h"
+#include "GameData/ABCharacterStat.h"
 
 DEFINE_LOG_CATEGORY(LogABCharacter);
 
@@ -35,7 +36,7 @@ AABCharacterBase::AABCharacterBase()
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->JumpZVelocity = 500.f; //default 700
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -109,8 +110,9 @@ void AABCharacterBase::PostInitializeComponents()
 	//Set UI Location
 	HpBar->SetRelativeLocation(FVector(0, 0, GetMesh()->Bounds.BoxExtent.Z * 2.0f + 20.0f));
 
-	//Binding Delegate
+	//Binding Stat Delegates
 	Stat->OnHpZero.AddUObject(this, &AABCharacterBase::SetDead);
+	Stat->OnStatChanged.AddUObject(this, &AABCharacterBase::OnStatChanged);
 }
 
 void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* InCharacterControlData)
@@ -201,6 +203,15 @@ void AABCharacterBase::SetLevel(int32 InNewLevel)
 	Stat->SetLevelStat(InNewLevel);
 }
 
+void AABCharacterBase::OnStatChanged(const FABCharacterStat& Base, const FABCharacterStat& Modifier)
+{
+	//subscriber for  Stat::FOnStatChangeDelegate
+	FABCharacterStat TotalStat = Stat->GetTotalStat();
+	float MovementSpeed = TotalStat.MovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+	return;
+}
+
 void AABCharacterBase::SetupCharacterWidget(UABUserWidget* InUserWidget)
 {
 	//TODO :  BidnMap< WidgetClass, BindFucntion >
@@ -259,12 +270,20 @@ void AABCharacterBase::TakeItem(UABItemData* InItemData)
 
 void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
 {
-	FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation();
-	float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	FVector CapsuleTopLocation = CapsuleLocation + FVector(0.0f, 0.0f, CapsuleHalfHeight + 30.f);
-	DrawDebugString(GetWorld(), CapsuleTopLocation, TEXT("Potion"), nullptr, FColor::Black , 1.0f, false, 1.5f);
-	
-	//UE_LOG(LogABCharacter, Log, TEXT("Drink Potion"));
+	//draw debug string
+	{
+		FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation();
+		float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		FVector CapsuleTopLocation = CapsuleLocation + FVector(0.0f, 0.0f, CapsuleHalfHeight + 30.f);
+		DrawDebugString(GetWorld(), CapsuleTopLocation, TEXT("Potion"), nullptr, FColor::Black, 1.0f, false, 1.5f);
+	}
+
+	UABPotionItemData* PotionItemData = Cast<UABPotionItemData>(InItemData);
+	if (PotionItemData)
+	{
+		Stat->AddCurrentHp(PotionItemData->HealAmount);
+	}
+
 }
 void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 {
@@ -283,12 +302,20 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
 {
-	FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation();
-	float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	FVector CapsuleTopLocation = CapsuleLocation + FVector(0.0f, 0.0f, CapsuleHalfHeight + 30.f);
-	DrawDebugString(GetWorld(), CapsuleTopLocation, TEXT("Scroll"), nullptr, FColor::Black, 1.0f, false, 1.5f);
+	//draw debug string
+	{
+		FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation();
+		float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		FVector CapsuleTopLocation = CapsuleLocation + FVector(0.0f, 0.0f, CapsuleHalfHeight + 30.f);
+		DrawDebugString(GetWorld(), CapsuleTopLocation, TEXT("Scroll"), nullptr, FColor::Black, 1.0f, false, 1.5f);
+	}
 
-	//UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
+	UABScrollItemData* ScrollItemData = Cast<UABScrollItemData>(InItemData);
+	if (ScrollItemData)
+	{
+		Stat->AddBaseStat(ScrollItemData->BaseStat);
+	}
+
 }
 
 

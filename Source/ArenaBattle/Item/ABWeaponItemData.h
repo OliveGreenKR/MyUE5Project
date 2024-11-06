@@ -15,10 +15,8 @@ class ARENABATTLE_API UABWeaponItemData : public UABItemData
 {
 	GENERATED_BODY()
 public:
-	virtual FPrimaryAssetId GetPrimaryAssetId() const override
-	{
-		return FPrimaryAssetId("ABItemData", GetFName());
-	}
+	UABWeaponItemData();
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	TSoftObjectPtr<USkeletalMesh> WeaponMesh;

@@ -24,23 +24,30 @@ public:
 
 public:
 	void SetLevelStat(int32 InNewLevel);
-	FORCEINLINE float GetCurrentLevel() const									{ return CurrentLevel; }
 	FORCEINLINE void SetModifierStat(const FABCharacterStat& InModifierStat)	{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
 	FORCEINLINE void SetBaseStat(const FABCharacterStat& InBaseStat)			{ BaseStat = InBaseStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
+	
+	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
 	FORCEINLINE const FABCharacterStat& GetBaseStat() const						{ return BaseStat; }
 	FORCEINLINE const FABCharacterStat& GetModifierStat() const					{ return ModifierStat; }
 	FORCEINLINE FABCharacterStat GetTotalStat() const							{ return BaseStat + ModifierStat; }
 	FORCEINLINE float GetCurrentHp() const										{ return CurrentHp; }
+	
+	void AddCurrentHp(float InHpDelta)											{ SetCurrentHp(CurrentHp + InHpDelta); }
+	void AddBaseStat(const FABCharacterStat& InDeltaStat)						{ SetBaseStat(BaseStat + InDeltaStat); }
 	float ApplyDamage(float InDamage);
 
 public:
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
 	FOnStatChangeedDelegate OnStatChanged;
+
 protected:
-	//CurrentHp must be set by this function. forcely set Hp in range [0:MaxHp]
-	void SetCurrentHp(float NewHp);
 	virtual void InitializeComponent() override;
+
+private:
+	//CurrentHp must be set by this function. forcely set Hp in range [0:MaxHp] and BroadCast 'OnHpChanged'
+	void SetCurrentHp(float NewHp);
 
 protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)

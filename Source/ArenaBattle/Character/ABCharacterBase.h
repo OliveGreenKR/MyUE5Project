@@ -65,8 +65,6 @@ private:
 	FVector ManualDirection = FVector::ZeroVector;
 	bool bManualReDireciton : 1 = false;
 #pragma endregion
-
-
 #pragma region Skill Components
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
@@ -75,9 +73,9 @@ protected:
 
 #pragma region Stat Component
 public :
-	FORCEINLINE class UABCharacterStatComponent* GetStat() { return Stat; }
 	const int32 GetLevel();
 	void SetLevel(int32 InNewLevel);
+	void OnStatChanged(const struct FABCharacterStat& Base, const struct FABCharacterStat& Modifier);
 
 protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat, meta=(AllowPrivateAccess = "true"))
