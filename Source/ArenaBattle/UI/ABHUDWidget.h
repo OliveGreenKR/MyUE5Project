@@ -29,6 +29,6 @@ protected:
 	TObjectPtr<class UABHpBarWidget> HpBar;
 
 	UPROPERTY()
-	TObjectPtr<class UABCharacterStatWidget> CharacterStat;
+	TObjectPtr<class UABCharacterStatWidget> CharacterStatDisplay;
 
 };

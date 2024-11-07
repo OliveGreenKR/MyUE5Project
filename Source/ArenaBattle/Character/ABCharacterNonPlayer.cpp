@@ -106,11 +106,11 @@ void AABCharacterNonPlayer::AttackByAI()
 		SkillParameters OutSkillParams = SkillParameters();
 		FABCharacterStat TotalStat = Stat->GetTotalStat();
 
-		OutSkillParams.SkillDamageModifier =  bDrawDebug ? 0.0f : TotalStat.Attack;
+		OutSkillParams.SkillDamageModifier = TotalStat.Attack;
 
 		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
-		OutSkillParams.SkillSpeedRate = bDrawDebug ? 0.85f * TotalStat.AttackSpeedRate : TotalStat.AttackSpeedRate;
+		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
 
 		BasicSkillComponent->OnSkillBegin.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None); });
 		BasicSkillComponent->OnSkillEnd.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking); });

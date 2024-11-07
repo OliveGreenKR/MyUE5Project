@@ -265,7 +265,15 @@ void AABStageGimmick::OnOpponentDestroyed(AActor* DestroyedActor)
 
 void AABStageGimmick::OnOpponentSpawn()
 {
-	const FTransform SpawnTransform (GetActorLocation() + FVector::UpVector * 88.0f);
+	//random spawn position
+	FVector SpawnVector = GetActorLocation() + FVector::UpVector * 88.0f;
+	float Radians = FMath::RandRange(0.0f, 2 * PI);
+	float Radius = 420.0f;
+	SpawnVector.X += Radius * FMath::Cos(Radians);
+	SpawnVector.Y += Radius * FMath::Sin(Radians);
+	//set spawn transform
+	const FTransform SpawnTransform (SpawnVector);
+
 	AABCharacterNonPlayer* ABOpponentCharacter = GetWorld()->SpawnActorDeferred<AABCharacterNonPlayer>(OpponentClass, SpawnTransform);
 
 	if (ABOpponentCharacter)

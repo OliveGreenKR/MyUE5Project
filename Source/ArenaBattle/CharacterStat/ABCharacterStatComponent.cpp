@@ -19,13 +19,18 @@ void UABCharacterStatComponent::SetLevelStat(int32 InNewLevel)
 }
 
 
+void UABCharacterStatComponent::AddBaseStat(const FABCharacterStat& InDeltaStat)
+{
+	SetBaseStat(BaseStat + InDeltaStat);
+	AddCurrentHp(InDeltaStat.MaxHp);
+}
+
 float UABCharacterStatComponent::ApplyDamage(float InDamage)
 {
-	const float PrevHp = CurrentHp;
 	// get Always 0 or higher Damage value.
 	const float ActualDamage = FMath::Clamp<float>(InDamage, 0, InDamage);
 
-	SetCurrentHp(PrevHp - ActualDamage);
+	AddCurrentHp(-ActualDamage);
 
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
 	{

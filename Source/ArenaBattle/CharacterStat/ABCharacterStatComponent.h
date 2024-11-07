@@ -24,8 +24,8 @@ public:
 
 public:
 	void SetLevelStat(int32 InNewLevel);
-	FORCEINLINE void SetModifierStat(const FABCharacterStat& InModifierStat)	{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
-	FORCEINLINE void SetBaseStat(const FABCharacterStat& InBaseStat)			{ BaseStat = InBaseStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
+	void SetModifierStat(const FABCharacterStat& InModifierStat)	{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
+	void SetBaseStat(const FABCharacterStat& InBaseStat)			{ BaseStat = InBaseStat; OnStatChanged.Broadcast(BaseStat,ModifierStat); }
 	
 	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
 	FORCEINLINE const FABCharacterStat& GetBaseStat() const						{ return BaseStat; }
@@ -33,8 +33,8 @@ public:
 	FORCEINLINE FABCharacterStat GetTotalStat() const							{ return BaseStat + ModifierStat; }
 	FORCEINLINE float GetCurrentHp() const										{ return CurrentHp; }
 	
-	void AddCurrentHp(float InHpDelta)											{ SetCurrentHp(CurrentHp + InHpDelta); }
-	void AddBaseStat(const FABCharacterStat& InDeltaStat)						{ SetBaseStat(BaseStat + InDeltaStat); }
+	FORCEINLINE void AddCurrentHp(float InHpDelta)								{ SetCurrentHp(CurrentHp + InHpDelta); }
+	void AddBaseStat(const FABCharacterStat& InDeltaStat);
 	float ApplyDamage(float InDamage);
 
 public:
