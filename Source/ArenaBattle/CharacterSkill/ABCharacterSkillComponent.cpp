@@ -36,8 +36,8 @@ void UABCharacterSkillComponent::CancelSkill()
 	if (isCancelable && IsCombo())
 	{
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		//Montage Stop ->When MontangeEnded -> SkillEnd is called by Delegate.
 		AnimInstance->Montage_Stop(1.0f, SkillData->SkillMontage);
+		SkillEnd();
 	}
 }
 
@@ -197,12 +197,12 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 	const FSkillDataPerMotion& NowMotionData = SkillData->GetSkillMotionData(GetCurrentCombo() - 1);
 
 	const FQuat CollisionRotation = FRotationMatrix::MakeFromXZ(SkillDirection, FVector::UpVector).ToQuat(); //forward to unit:x
-	const FVector Start = GetOwner()->GetActorLocation() +
-		SkillDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
-	const FCollisionShape CollisionShape = GetCurrentSkillShape();
+	const FVector Start = GetOwner()->GetActorLocation() + SkillDirection * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
+	FCollisionShape CollisionShape = GetCurrentSkillShape();
 	const FVector End = GetOwner()->GetActorLocation() + SkillDirection * GetCurrentSkillHitRange();
+	const FVector Origin = (Start + End) * 0.5f;
 
-	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
+	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Origin, Origin, CollisionRotation, CCHANNEL_ABACTION, CollisionShape, Params);
 	if (HitDetected)
 	{
 
@@ -219,11 +219,9 @@ void UABCharacterSkillComponent::PerformSkillHitCheck()
 
 	if (bDrawDebug)
 	{
-		const FVector Origin = (Start + End) * 0.5f;
 		const FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 		const float DebugDuration = 1.0f;
 		DrawDebugSkillCollision(Origin, CollisionRotation, DrawColor, DebugDuration);
-	
 		//Draw hit point
 		for (const FHitResult& HitResult : OutHitResults)
 		{
@@ -267,6 +265,5 @@ const FCollisionShape UABCharacterSkillComponent::GetSkillShape(int32 SkillIdx) 
 
 const float UABCharacterSkillComponent::GetSkillHitRange(int32 SkillIdx) const
 {
-	return OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius()
-		+ GetSkillShape(SkillIdx).GetExtent().X;
+	return 2 * GetSkillShape(SkillIdx).GetExtent().X;
 }
