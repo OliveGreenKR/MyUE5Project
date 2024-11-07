@@ -17,6 +17,7 @@
 #include "Item/ABItems.h"
 #include "GameData/ABCharacterStat.h"
 
+
 DEFINE_LOG_CATEGORY(LogABCharacter);
 
 // Sets default values
@@ -185,9 +186,18 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	UAnimMontage* HitReactionMontage = Cast<UAnimMontage>(StaticLoadObject(UAnimMontage::StaticClass(), nullptr, *MontagePath));
 	if (HitReactionMontage)
 	{
-		FAlphaBlend BlendParams;
-		BlendParams.SetBlendTime(0.5f);
-		AnimInstance->Montage_PlayWithBlendIn(HitReactionMontage, BlendParams);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		AnimInstance->Montage_Play(HitReactionMontage);
+		//Set Montage End Deligate
+		//Set Montage End Delegate
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindLambda(
+			[this](UAnimMontage* Montage, bool bInterrupted)
+			{
+				this->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			}
+		);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, HitReactionMontage);
 	}
 
 	Stat->ApplyDamage(DamageAmount);
