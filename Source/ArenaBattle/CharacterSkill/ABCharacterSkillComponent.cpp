@@ -33,9 +33,10 @@ void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillPara
 
 void UABCharacterSkillComponent::CancelSkill()
 {
-	if (IsCombo()&& isCancelable)
+	if (isCancelable && IsCombo())
 	{
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		//Montage Stop ->When MontangeEnded -> SkillEnd is called by Delegate.
 		AnimInstance->Montage_Stop(1.0f, SkillData->SkillMontage);
 	}
 }
