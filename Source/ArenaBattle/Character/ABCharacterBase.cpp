@@ -180,6 +180,9 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	float InTrueDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	//try skill cancel
+	BasicSkillComponent->CancelSkill();
+
 	//hitreaction - ohter montage is all stop
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	static const FString& MontagePath = FString::Printf(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/Warriors/AM_HitReaction.AM_HitReaction'"));
@@ -209,8 +212,7 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		FString DebugText = FString::Printf(TEXT("Taken Damage : %.3f "), DamageAmount);
 		DrawDebugString(GetWorld(), TopOfCapsule, DebugText, nullptr, DebugColor, 1.f, true, 3.0f);
 	}
-	//try skill cancel
-	BasicSkillComponent->CancelSkill();
+
 
 	return InTrueDamage;
 }
