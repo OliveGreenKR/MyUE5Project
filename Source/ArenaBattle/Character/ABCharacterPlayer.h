@@ -25,7 +25,6 @@ protected:
 	virtual void SetDead() override;
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 #pragma region Character Control Section
 protected:
 	void ChangeCharacterControl();

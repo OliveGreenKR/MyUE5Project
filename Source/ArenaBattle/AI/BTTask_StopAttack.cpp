@@ -28,6 +28,4 @@ EBTNodeResult::Type UBTTask_StopAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	AIPawn->StopAttackByAI();
 	return EBTNodeResult::Succeeded;
-
-	return Result;
 }

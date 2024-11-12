@@ -123,6 +123,7 @@ public:
 	FORCEINLINE const int32 GetStageNum() const { return CurrentStageNum; }
 	FORCEINLINE void SetStageNum(int32 NewStageNum) { CurrentStageNum = NewStageNum; }
 protected:
+	//Stage Level
 	UPROPERTY(VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	int32 CurrentStageNum;
 };

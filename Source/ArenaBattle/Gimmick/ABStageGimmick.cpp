@@ -8,6 +8,8 @@
 #include "Character/ABCharacterNonPlayer.h"
 #include "Item/ABItemBox.h"
 #include "Engine/OverlapResult.h"
+#include "Interface/ABGameInterface.h"
+#include "GameFramework/GameMode.h"
 
 // Sets default values
 AABStageGimmick::AABStageGimmick()
@@ -260,6 +262,18 @@ void AABStageGimmick::SetChooseNext()
 
 void AABStageGimmick::OnOpponentDestroyed(AActor* DestroyedActor)
 {
+	IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
+	if (ABGameMode)
+	{
+		//Update Current Score
+		ABGameMode->SetPlayerScore(CurrentStageNum);
+		if (ABGameMode->IsGameCleared())
+		{
+			//Game Cleared
+			return;
+		}
+	}
+
 	SetState(EStageState::REWARD);
 }
 

@@ -2,6 +2,7 @@
 
 
 #include "Game/ABGameMode.h"
+#include "Player/ABPlayerController.h"
 
 AABGameMode::AABGameMode()
 {
@@ -17,4 +18,47 @@ AABGameMode::AABGameMode()
 		PlayerControllerClass = PlayerControllerRef.Class;
 	}
 
+	ClearScore = 3;
+	CurrentScore = 0;
+	bIsCleared = false;
+}
+
+void AABGameMode::SetPlayerScore(int32 NewPlayerScore)
+{
+	CurrentScore = NewPlayerScore;
+
+	//Get Current PlayerController - in single game
+	AABPlayerController* ABPlayerController = Cast<AABPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (ABPlayerController)
+	{
+		//Request to ABPlayerController 
+		ABPlayerController->GameScoreChanged(NewPlayerScore);
+	}
+
+	if (CurrentScore >= ClearScore)
+	{
+		bIsCleared = true;
+
+		if (ABPlayerController)
+		{
+			//Request to ABPlayerController
+			ABPlayerController->GameClear();
+		}
+	}
+}
+
+void AABGameMode::OnPlayerDead()
+{
+	//Get Current PlayerController - in single game
+	AABPlayerController* ABPlayerController = Cast<AABPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (ABPlayerController)
+	{
+		//Request to ABPlayerController 
+		ABPlayerController->GameOver();
+	}
+}
+
+bool AABGameMode::IsGameCleared()
+{
+	return bIsCleared;
 }

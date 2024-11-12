@@ -16,6 +16,22 @@ class ARENABATTLE_API AABPlayerController : public APlayerController
 
 public:
 	AABPlayerController();
+
+#pragma region GameMode
+protected:
+	//For BP_Node 
+	UFUNCTION(BlueprintImplementableEvent, Category = Game,Meta = (DIsplayName = "OnScoreChangedCPP"))
+	void K2_OnScoreChanged(int32 NewScore);
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DIsplayName = "OnGameOverCPP"))
+	void K2_OnGameOver();
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DIsplayName = "OnGameClearCPP"))
+	void K2_OnGameClear();
+
+public :
+	void GameScoreChanged(int32 NewScore);
+	void GameOver();
+	void GameClear();
+#pragma endregion
 	
 protected:
 	virtual void BeginPlay() override;
