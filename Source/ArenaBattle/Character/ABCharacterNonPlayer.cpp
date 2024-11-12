@@ -50,7 +50,6 @@ void AABCharacterNonPlayer::SetDead()
 	}
 	
 	FTimerHandle DeadTimerHandle;
-
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
 		[&]() {
 			Destroy();
