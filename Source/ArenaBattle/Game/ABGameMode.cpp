@@ -27,6 +27,8 @@ void AABGameMode::SetPlayerScore(int32 NewPlayerScore)
 {
 	CurrentScore = NewPlayerScore;
 
+	OnScoreChanged.BroadCast(CurrentScore);
+
 	//Get Current PlayerController - in single game
 	AABPlayerController* ABPlayerController = Cast<AABPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (ABPlayerController)
@@ -35,20 +37,14 @@ void AABGameMode::SetPlayerScore(int32 NewPlayerScore)
 		ABPlayerController->GameScoreChanged(NewPlayerScore);
 	}
 
-	if (CurrentScore >= ClearScore)
-	{
-		bIsCleared = true;
-
-		if (ABPlayerController)
-		{
-			//Request to ABPlayerController
-			ABPlayerController->GameClear();
-		}
-	}
+	DetermineGameClear(ABPlayerController);
 }
 
 void AABGameMode::OnPlayerDead()
 {
+	check(bIsCleared == false);
+	OnGameCleared.Broadcast(bIsCleared);
+
 	//Get Current PlayerController - in single game
 	AABPlayerController* ABPlayerController = Cast<AABPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (ABPlayerController)
@@ -61,4 +57,19 @@ void AABGameMode::OnPlayerDead()
 bool AABGameMode::IsGameCleared()
 {
 	return bIsCleared;
+}
+
+void AABGameMode::DetermineGameClear(AABPlayerController* InPlayerController)
+{
+	if (CurrentScore >= ClearScore)
+	{
+		bIsCleared = true;
+		OnGameCleared.Broadcast(bIsCleared);
+
+		if (InPlayerController)
+		{
+			//Request to ABPlayerController
+			InPlayerController->GameClear();
+		}
+	}
 }
