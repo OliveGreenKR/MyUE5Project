@@ -6,9 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "Interface/ABGameInterface.h"
 #include "ABGameMode.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameEndDelegate,uint8,bIsGameCleared);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameScoreChanged,int32,NewPlayerScore);
 /**
  * 
  */
@@ -25,17 +22,7 @@ public:
 	void OnPlayerDead() override;
 	bool IsGameCleared() override;
 
-private:
-	void DetermineGameClear(class AABPlayerController* InPlayerController);
-
 public:
-	UPROPERTY(BlueprintAssignable, Category = Game)
-	FOnGameEndDelegate OnGameCleared;
-
-	UPROPERTY(BlueprintAssignable, Category = Game)
-	FOnGameScoreChanged OnScoreChanged;
-
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Game)
 	int32 ClearScore;
 
@@ -44,6 +31,4 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Game)
 	uint8 bIsCleared : 1;
-
-
 };

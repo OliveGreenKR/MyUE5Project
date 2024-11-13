@@ -37,12 +37,12 @@ protected:
 	virtual void BeginPlay() override;
 
 
-#pragma region HUD
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = HUD)
-	TSubclassOf<class UABHUDWidget> ABHUDWidgetClass;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
-	TObjectPtr<class UABHUDWidget> ABHUDWidget;
-#pragma endregion
+//#pragma region HUD
+//protected:
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = HUD)
+//	TSubclassOf<class UABHUDWidget> ABHUDWidgetClass;
+//
+//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
+//	TObjectPtr<class UABHUDWidget> ABHUDWidget;
+//#pragma endregion
 };
