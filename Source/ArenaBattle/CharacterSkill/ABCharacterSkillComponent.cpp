@@ -37,7 +37,6 @@ void UABCharacterSkillComponent::CancelSkill(float InBlendInTime)
 	{
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Stop(InBlendInTime,SkillData->SkillMontage);
-		SkillEnd();
 	}
 }
 

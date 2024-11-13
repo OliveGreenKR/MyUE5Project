@@ -184,7 +184,11 @@ void AABCharacterBase::Tick(float DeltaTime)
 float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float InTrueDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	//HitReaction Process First
 	OnHit();
+
+	//Show Debug Damage Text
 	if (bDrawDebug)
 	{
 		const FVector TopOfCapsule = GetActorLocation() + FVector(0.f, 0.f, GetSimpleCollisionHalfHeight() + 10.0f);
@@ -192,13 +196,15 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		FString DebugText = FString::Printf(TEXT("Taken Damage : %.3f "), DamageAmount);
 		DrawDebugString(GetWorld(), TopOfCapsule, DebugText, nullptr, DebugColor, 1.f, true, 3.0f);
 	}
+
+	//Dead Anim Last
 	Stat->ApplyDamage(DamageAmount);
 	return InTrueDamage;
 }
 void AABCharacterBase::OnHit()
 {
 	//try skill cancel
-	BasicSkillComponent->CancelSkill(1.0f);
+	BasicSkillComponent->CancelSkill(0.0f);
 	//PlayHitReaction
 	PlayHitReaction(1.0f);
 }
@@ -266,13 +272,14 @@ void AABCharacterBase::SetDead()
 {
 	if (BasicSkillComponent)
 	{
-		BasicSkillComponent->CancelSkill(1.0f);
+		BasicSkillComponent->CancelSkill(0.0f);
 		BasicSkillComponent->Deactivate();
 	}
+	PlayDeadAnimation();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	SetActorEnableCollision(false);
 	HpBar->SetHiddenInGame(true);
-	PlayDeadAnimation();
+	
 }
 
 void AABCharacterBase::PlayDeadAnimation()

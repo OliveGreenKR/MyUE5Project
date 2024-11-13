@@ -24,7 +24,6 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 		RequestAsyncLoad(NPCMeshes[RandIndex], FStreamableDelegate::CreateUObject(this, &AABCharacterNonPlayer::NPCMeshLoadCompleted));
 
 	BasicSkillComponent->Activate();
-
 	bDrawDebug = true;
 }
 
