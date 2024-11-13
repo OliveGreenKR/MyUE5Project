@@ -73,6 +73,11 @@ AABCharacterBase::AABCharacterBase()
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitReactionMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/Warriors/AM_HitReaction.AM_HitReaction'"));
+	if (HitReactionMontageRef.Object)
+	{
+		HitReactionMontage = HitReactionMontageRef.Object;
+	}
 
 	//SkillComponents
 	BasicSkillComponent = CreateDefaultSubobject<UABCharacterSkillComponent>(TEXT("BasicSkill"));
@@ -179,32 +184,7 @@ void AABCharacterBase::Tick(float DeltaTime)
 float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float InTrueDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	//try skill cancel
-	BasicSkillComponent->CancelSkill();
-
-	//hitreaction - ohter montage is all stop
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	static const FString& MontagePath = FString::Printf(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/Warriors/AM_HitReaction.AM_HitReaction'"));
-	UAnimMontage* HitReactionMontage = Cast<UAnimMontage>(StaticLoadObject(UAnimMontage::StaticClass(), nullptr, *MontagePath));
-	if (HitReactionMontage)
-	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		AnimInstance->Montage_Play(HitReactionMontage);
-		//Set Montage End Deligate
-		//Set Montage End Delegate
-		FOnMontageEnded EndDelegate;
-		EndDelegate.BindLambda(
-			[this](UAnimMontage* Montage, bool bInterrupted)
-			{
-				this->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-			}
-		);
-		AnimInstance->Montage_SetEndDelegate(EndDelegate, HitReactionMontage);
-	}
-
-	Stat->ApplyDamage(DamageAmount);
-
+	OnHit();
 	if (bDrawDebug)
 	{
 		const FVector TopOfCapsule = GetActorLocation() + FVector(0.f, 0.f, GetSimpleCollisionHalfHeight() + 10.0f);
@@ -212,9 +192,26 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		FString DebugText = FString::Printf(TEXT("Taken Damage : %.3f "), DamageAmount);
 		DrawDebugString(GetWorld(), TopOfCapsule, DebugText, nullptr, DebugColor, 1.f, true, 3.0f);
 	}
-
-
+	Stat->ApplyDamage(DamageAmount);
 	return InTrueDamage;
+}
+void AABCharacterBase::OnHit()
+{
+	//try skill cancel
+	BasicSkillComponent->CancelSkill(1.0f);
+	//PlayHitReaction
+	PlayHitReaction(1.0f);
+}
+void AABCharacterBase::PlayHitReaction(float InBlendInTime)
+{
+	if (HitReactionMontage)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		FAlphaBlendArgs BlendArgs;
+		BlendArgs.BlendTime = InBlendInTime;
+		AnimInstance->Montage_PlayWithBlendIn(HitReactionMontage, BlendArgs);
+	}
 }
 const int32 AABCharacterBase::GetLevel()
 {
@@ -269,13 +266,13 @@ void AABCharacterBase::SetDead()
 {
 	if (BasicSkillComponent)
 	{
-		BasicSkillComponent->CancelSkill();
+		BasicSkillComponent->CancelSkill(1.0f);
 		BasicSkillComponent->Deactivate();
 	}
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	PlayDeadAnimation();
 	SetActorEnableCollision(false);
 	HpBar->SetHiddenInGame(true);
+	PlayDeadAnimation();
 }
 
 void AABCharacterBase::PlayDeadAnimation()

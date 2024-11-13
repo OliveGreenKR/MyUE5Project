@@ -12,7 +12,6 @@ AABCharacterNonPlayer::AABCharacterNonPlayer()
 
 	AIControllerClass = AABAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
 }
 
 void AABCharacterNonPlayer::PostInitializeComponents()
@@ -26,15 +25,7 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 
 	BasicSkillComponent->Activate();
 
-	if (bIsDummy)
-	{
-		AIControllerClass = nullptr;
-		bDrawDebug = false;
-	}
-	else
-	{
-		bDrawDebug = true;
-	}
+	bDrawDebug = true;
 }
 
 void AABCharacterNonPlayer::SetDead()
@@ -122,7 +113,7 @@ void AABCharacterNonPlayer::StopAttackByAI()
 {
 	if (BasicSkillComponent && BasicSkillComponent->IsActive())
 	{
-		BasicSkillComponent->CancelSkill();
+		BasicSkillComponent->CancelSkill(1.0f);
 	}
 }
 

@@ -39,7 +39,7 @@ public:
 
 public:
 	virtual void ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug = false) = 0;
-	virtual void CancelSkill() = 0;
+	virtual void CancelSkill(float InBlendInTime = 0.0f) = 0;
 	virtual const float GetSkillRange() const = 0;
 
 	FOnSkillEndDelegate OnSkillEnd;

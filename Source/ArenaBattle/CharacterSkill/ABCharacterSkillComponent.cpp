@@ -31,12 +31,12 @@ void UABCharacterSkillComponent::ExecuteSkill(const SkillParameters& InSkillPara
 	}
 }
 
-void UABCharacterSkillComponent::CancelSkill()
+void UABCharacterSkillComponent::CancelSkill(float InBlendInTime)
 {
 	if (isCancelable && IsCombo())
 	{
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Stop(1.0f, SkillData->SkillMontage);
+		AnimInstance->Montage_Stop(InBlendInTime,SkillData->SkillMontage);
 		SkillEnd();
 	}
 }

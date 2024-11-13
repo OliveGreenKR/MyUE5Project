@@ -36,7 +36,6 @@ class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABCharacterW
 public:
 	// Sets default values for this character's properties
 	AABCharacterBase();
-
 	virtual void PostInitializeComponents() override;
 
 protected:
@@ -49,7 +48,18 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
+#pragma region Hit Reaction
+protected:
+	virtual void OnHit();
 
+private:
+	void PlayHitReaction(float InBlendInTime = 1.0f);
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> HitReactionMontage;
+
+#pragma endregion
 #pragma region Manual Redireciton
 protected :
 	void SetManualDirection(const FVector& InDirection) 

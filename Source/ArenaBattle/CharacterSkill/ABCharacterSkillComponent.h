@@ -25,7 +25,7 @@ protected:
 public:
 	//Inherited IABSkillExecutionInterface
 	virtual void ExecuteSkill(const SkillParameters& InSkillParams, bool DrawDebug = false) override;
-	virtual void CancelSkill() override;
+	virtual void CancelSkill(float InBlendInTime = 0.0f) override;
 	virtual const float GetSkillRange() const;
 
 	FORCEINLINE const bool IsCombo() const		{ return (CurrentCombo > 0); }
