@@ -25,6 +25,9 @@ protected:
 	virtual void SetDead() override;
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+#pragma region HitReaction
+	//virtual void PlayHitReaction(float InBlendInTime = 1.0f) override;
+#pragma endregion
 #pragma region Character Control Section
 protected:
 	void ChangeCharacterControl();

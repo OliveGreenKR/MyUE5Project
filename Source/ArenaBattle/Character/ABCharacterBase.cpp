@@ -214,9 +214,20 @@ void AABCharacterBase::PlayHitReaction(float InBlendInTime)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
 		FAlphaBlendArgs BlendArgs;
 		BlendArgs.BlendTime = InBlendInTime;
 		AnimInstance->Montage_PlayWithBlendIn(HitReactionMontage, BlendArgs);
+
+
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindLambda([&](UAnimMontage* Montage, bool bInterrupted)
+							   {
+								   GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+							   });
+
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, HitReactionMontage);
 	}
 }
 const int32 AABCharacterBase::GetLevel()

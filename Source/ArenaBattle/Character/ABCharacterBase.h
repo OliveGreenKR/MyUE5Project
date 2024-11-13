@@ -51,9 +51,7 @@ protected:
 #pragma region Hit Reaction
 protected:
 	virtual void OnHit();
-
-private:
-	void PlayHitReaction(float InBlendInTime = 1.0f);
+	virtual void PlayHitReaction(float InBlendInTime = 1.0f);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
