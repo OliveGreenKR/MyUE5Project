@@ -213,7 +213,6 @@ void AABCharacterBase::PlayHitReaction(float InBlendInTime)
 	if (HitReactionMontage)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 		FAlphaBlendArgs BlendArgs;

@@ -54,6 +54,5 @@ private:
 #pragma endregion
 #pragma region HitReaction
 	//virtual void PlayHitReaction(float InBlendInTime = 1.0f) override;
-	//TODO : When Hit, AI Stop..?
 #pragma endregion
 };

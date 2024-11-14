@@ -20,6 +20,7 @@ public:
 
 protected:
 	virtual void OnRegister() override;
+	virtual void BeginPlay() override;
 
 #pragma region SkillExecutions
 public:
@@ -42,6 +43,7 @@ protected:
 private:
 	void SkillBegin();
 
+	UFUNCTION()
 	void OnSkillMontageEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	void SkillEnd();
 	void SetComboCheckTimer();
@@ -54,11 +56,13 @@ private:
 
 private: 
 	bool isCancelable : 1 = true;
+	UPROPERTY(VisibleAnywhere)
 	int32 CurrentCombo = 0;
-	FTimerHandle ComboTimerHandle;
-	FTimerHandle ComboIgnoreTimerHandle;
+	FTimerHandle ComboTimerHandle;          //enable cobo input 
+	FTimerHandle ComboIgnoreTimerHandle;    //combo input igonred time
 	FTimerHandle CoolDownTimerHandle;
 
+	UPROPERTY(VisibleAnywhere)
 	bool bHasNextComboCommand = false;
 	SkillParameters LastSkillParams = SkillParameters();
 

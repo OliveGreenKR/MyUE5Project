@@ -51,6 +51,15 @@ void UABCharacterSkillComponent::OnRegister()
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 }
 
+void UABCharacterSkillComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->OnMontageEnded.AddDynamic(this, &UABCharacterSkillComponent::OnSkillMontageEnd);
+	}
+}
+
 void UABCharacterSkillComponent::SetCancelable(const bool InBool)
 {
 	isCancelable = InBool;
@@ -82,31 +91,36 @@ void UABCharacterSkillComponent::SkillBegin()
 	ensureMsgf(AnimInstance, TEXT("%s doesn't have AnimInstance"), *(GetOwner()->GetName()));
 
 	CurrentCombo = 1;
-	
-	UCharacterMovementComponent* Movement = OwnerCharacter->GetCharacterMovement();
 
 	//TimerSet
 	ComboIgnoreTimerHandle.Invalidate();
-	CoolDownTimerHandle.Invalidate();
 	SetComboCheckTimer();
-	SetCoolDownTimer();
+	//CoolDownTimerHandle.Invalidate();
+	//SetCoolDownTimer();
+	
 
 	//Play Anim
 	AnimInstance->Montage_Play(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
 
 	//Set Montage End Deligate
-	FOnMontageEnded EndDeligate;
-	EndDeligate.BindUObject(this, &UABCharacterSkillComponent::OnSkillMontageEnd);
-	AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillData->SkillMontage);
+	//FOnMontageEnded EndDeligate;
+	//EndDeligate.BindUObject(this, &UABCharacterSkillComponent::OnSkillMontageEnd);
+	//AnimInstance->Montage_SetEndDelegate(EndDeligate, SkillData->SkillMontage);
 }
 
 void UABCharacterSkillComponent::OnSkillMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	SkillEnd();
+	if (TargetMontage == SkillData->SkillMontage)
+	{
+		SkillEnd();
+	}
 }
 
 void UABCharacterSkillComponent::SkillEnd()
 {
+	CoolDownTimerHandle.Invalidate();
+	SetCoolDownTimer();
+
 	ResetCombo();
 	bHasNextComboCommand = false;
 	bDrawDebug = false;
@@ -148,7 +162,7 @@ void UABCharacterSkillComponent::SetCoolDownTimer()
 	GetWorld()->GetTimerManager().SetTimer(CoolDownTimerHandle, this, &UABCharacterSkillComponent::OnCoolDownEnd, skillCoolTime, false);
 }
 
-//called when MontageEnd.
+//called when ComboTimerEnd.
 void UABCharacterSkillComponent::CheckSkillCombo()
 {
 	OnSkillSeqEnd.Broadcast();
