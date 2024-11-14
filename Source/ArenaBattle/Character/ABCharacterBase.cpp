@@ -121,6 +121,11 @@ void AABCharacterBase::PostInitializeComponents()
 	Stat->OnStatChanged.AddUObject(this, &AABCharacterBase::OnStatChanged);
 }
 
+void AABCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* InCharacterControlData)
 {
 	//Pawn
@@ -203,8 +208,6 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 }
 void AABCharacterBase::OnHit()
 {
-	//try skill cancel
-	BasicSkillComponent->CancelSkill(0.0f);
 	//PlayHitReaction
 	PlayHitReaction(1.0f);
 }
@@ -224,6 +227,8 @@ void AABCharacterBase::PlayHitReaction(float InBlendInTime)
 		EndDelegate.BindLambda([&](UAnimMontage* Montage, bool bInterrupted)
 							   {
 								   GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+								   //try skill cancel
+								   BasicSkillComponent->CancelSkill(0.0f);
 							   });
 
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, HitReactionMontage);

@@ -37,6 +37,7 @@ public:
 	// Sets default values for this character's properties
 	AABCharacterBase();
 	virtual void PostInitializeComponents() override;
+	virtual void BeginPlay() override;
 
 protected:
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData);

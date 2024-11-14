@@ -15,6 +15,7 @@
 UABCharacterSkillComponent::UABCharacterSkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	bAutoActivate = false;
 
 	static ConstructorHelpers::FObjectFinder<UABSkillData> SkillDataRef(TEXT("/Script/ArenaBattle.ABSkillData'/Game/ArenaBattle/Skill/ABS_BasicSwordSkill.ABS_BasicSwordSkill'"));
 	if (SkillDataRef.Object)
@@ -35,6 +36,7 @@ void UABCharacterSkillComponent::CancelSkill(float InBlendInTime)
 {
 	if (isCancelable && IsCombo())
 	{
+		//try stop skill montage
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Stop(InBlendInTime,SkillData->SkillMontage);
 	}
@@ -54,6 +56,7 @@ void UABCharacterSkillComponent::OnRegister()
 void UABCharacterSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
 	if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 	{
 		AnimInstance->OnMontageEnded.AddDynamic(this, &UABCharacterSkillComponent::OnSkillMontageEnd);
@@ -93,11 +96,7 @@ void UABCharacterSkillComponent::SkillBegin()
 	CurrentCombo = 1;
 
 	//TimerSet
-	ComboIgnoreTimerHandle.Invalidate();
 	SetComboCheckTimer();
-	//CoolDownTimerHandle.Invalidate();
-	//SetCoolDownTimer();
-	
 
 	//Play Anim
 	AnimInstance->Montage_Play(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
@@ -118,13 +117,23 @@ void UABCharacterSkillComponent::OnSkillMontageEnd(UAnimMontage* TargetMontage, 
 
 void UABCharacterSkillComponent::SkillEnd()
 {
-	CoolDownTimerHandle.Invalidate();
 	SetCoolDownTimer();
+
+	if (ComboIgnoreTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ComboIgnoreTimerHandle);
+		ComboIgnoreTimerHandle.Invalidate();
+	}
+	if (ComboTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ComboTimerHandle);
+		ComboTimerHandle.Invalidate();
+	}
 
 	ResetCombo();
 	bHasNextComboCommand = false;
 	bDrawDebug = false;
-	GetWorld()->GetTimerManager().ClearTimer(ComboIgnoreTimerHandle);
+	
 	OnSkillEnd.ExecuteIfBound();
 }
 
@@ -144,10 +153,13 @@ void UABCharacterSkillComponent::SetComboCheckTimer()
 		return;
 	}
 
-	FTimerDelegate OnComboIgnoreEndDelegate;
-	OnComboIgnoreEndDelegate.BindUFunction(this, FName("OnComboIgnoreEnd"), ComboEffectiveTime);
-
-	GetWorld()->GetTimerManager().SetTimer(ComboIgnoreTimerHandle, OnComboIgnoreEndDelegate, ComboIgnoreTime, false);
+	if (ComboIgnoreTimerHandle.IsValid()==false) 
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ComboIgnoreTimerHandle);
+		FTimerDelegate OnComboIgnoreEndDelegate;
+		OnComboIgnoreEndDelegate.BindUFunction(this, FName("OnComboIgnoreEnd"), ComboEffectiveTime);
+		GetWorld()->GetTimerManager().SetTimer(ComboIgnoreTimerHandle, OnComboIgnoreEndDelegate, ComboIgnoreTime, false);
+	}
 }
 
 void UABCharacterSkillComponent::SetCoolDownTimer()
@@ -159,7 +171,13 @@ void UABCharacterSkillComponent::SetCoolDownTimer()
 		return;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(CoolDownTimerHandle, this, &UABCharacterSkillComponent::OnCoolDownEnd, skillCoolTime, false);
+	//CoolDown Timer Set only When it is invalid.
+	if (CoolDownTimerHandle.IsValid()==false)
+	{
+		GetWorld()->GetTimerManager().SetTimer(CoolDownTimerHandle, this, &UABCharacterSkillComponent::OnCoolDownEnd, skillCoolTime, false);
+	}
+
+	
 }
 
 //called when ComboTimerEnd.
@@ -170,15 +188,18 @@ void UABCharacterSkillComponent::CheckSkillCombo()
 	if (bHasNextComboCommand)
 	{
 		UAnimInstance * AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		//NextCombo Index
-		SetComboNext();
 
-		//Play Next Combo Animation
-		FName NextSection = *FString::Printf(TEXT("%s%d"), *SkillData->ComboActionData->MontageSectionNamePrefix, GetCurrentCombo());
-		AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
-		AnimInstance->Montage_SetPlayRate(SkillData->SkillMontage,GetCurrentSkillSpeedRate());
-		SetComboCheckTimer();
-
+		if (AnimInstance->Montage_IsPlaying(SkillData->SkillMontage))
+		{
+			//NextCombo Index
+			SetComboNext();
+			//Play Next Combo Animation
+			FName NextSection = *FString::Printf(TEXT("%s%d"), *SkillData->ComboActionData->MontageSectionNamePrefix, GetCurrentCombo());
+			AnimInstance->Montage_JumpToSection(NextSection, SkillData->SkillMontage);
+			AnimInstance->Montage_SetPlayRate(SkillData->SkillMontage, GetCurrentSkillSpeedRate());
+			SetComboCheckTimer();
+		}
+		
 		bHasNextComboCommand = false;
 	}
 }
@@ -191,7 +212,10 @@ void UABCharacterSkillComponent::OnCoolDownEnd()
 void UABCharacterSkillComponent::OnComboIgnoreEnd(float ComboEffectiveTime)
 {
 	ComboIgnoreTimerHandle.Invalidate();
-	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UABCharacterSkillComponent::OnComboTimerEnd, ComboEffectiveTime, false);
+	if (ComboTimerHandle.IsValid() == false)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UABCharacterSkillComponent::OnComboTimerEnd, ComboEffectiveTime, false);
+	}
 }
 
 void UABCharacterSkillComponent::OnComboTimerEnd()

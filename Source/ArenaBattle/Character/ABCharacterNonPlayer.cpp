@@ -23,7 +23,6 @@ void AABCharacterNonPlayer::PostInitializeComponents()
 	NPCMeshHandle = UAssetManager::Get().GetStreamableManager().
 		RequestAsyncLoad(NPCMeshes[RandIndex], FStreamableDelegate::CreateUObject(this, &AABCharacterNonPlayer::NPCMeshLoadCompleted));
 
-	BasicSkillComponent->Activate();
 	bDrawDebug = true;
 }
 
@@ -60,6 +59,7 @@ void AABCharacterNonPlayer::NPCMeshLoadCompleted()
 	}
 
 	NPCMeshHandle->ReleaseHandle();
+	BasicSkillComponent->Activate();
 }
 
 float AABCharacterNonPlayer::GetAIPatrolRadius()
@@ -88,7 +88,7 @@ float AABCharacterNonPlayer::GetAITurnSpeed()
 
 void AABCharacterNonPlayer::AttackByAI()
 {
-	if (BasicSkillComponent)
+	if (BasicSkillComponent && BasicSkillComponent->IsActive())
 	{
 		using SkillParameters = IABSkillExecutorInterface::SkillParameters;
 

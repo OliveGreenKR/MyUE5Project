@@ -81,6 +81,7 @@ void AABCharacterPlayer::BeginPlay()
 		EnableInput(PlayerController);
 
 	}
+	BasicSkillComponent->Activate();
 	SetCharacterControl(CurrentCharacterControlType);
 }
 
