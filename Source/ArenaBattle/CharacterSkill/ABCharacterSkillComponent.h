@@ -36,6 +36,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCancelable(const bool InBool); 
+
+	UFUNCTION(BlueprintCallable)
+	float GetRemainSkillCoolDown();
 protected:
 	void ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug = false);
 	void SetComboNext();

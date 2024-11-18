@@ -227,8 +227,6 @@ void AABCharacterBase::PlayHitReaction(float InBlendInTime)
 		EndDelegate.BindLambda([&](UAnimMontage* Montage, bool bInterrupted)
 							   {
 								   GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-								   //try skill cancel
-								   BasicSkillComponent->CancelSkill(0.0f);
 							   });
 
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, HitReactionMontage);

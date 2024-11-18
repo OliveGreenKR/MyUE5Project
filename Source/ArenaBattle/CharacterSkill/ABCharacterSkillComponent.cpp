@@ -68,6 +68,18 @@ void UABCharacterSkillComponent::SetCancelable(const bool InBool)
 	isCancelable = InBool;
 }
 
+float UABCharacterSkillComponent::GetRemainSkillCoolDown()
+{
+	if (CoolDownTimerHandle.IsValid())
+	{
+		return GetWorld()->GetTimerManager().GetTimerRemaining(CoolDownTimerHandle);
+	}
+	else
+	{
+		return -1.0f;
+	}
+}
+
 void UABCharacterSkillComponent::ProcessSkill(const SkillParameters& InSkillParams, bool DrawDebug)
 {
 	//First
