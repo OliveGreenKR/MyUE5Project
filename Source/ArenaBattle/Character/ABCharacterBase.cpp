@@ -216,11 +216,12 @@ void AABCharacterBase::PlayHitReaction(float InBlendInTime)
 	if (HitReactionMontage)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 		FAlphaBlendArgs BlendArgs;
 		BlendArgs.BlendTime = InBlendInTime;
 		AnimInstance->Montage_PlayWithBlendIn(HitReactionMontage, BlendArgs);
+		
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 
 		FOnMontageEnded EndDelegate;
