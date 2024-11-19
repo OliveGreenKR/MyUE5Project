@@ -191,7 +191,7 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	float InTrueDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	//HitReaction Process First
-	OnHit();
+	OnHit(1.0f);
 
 	//Show Debug Damage Text
 	if (bDrawDebug)
@@ -206,33 +206,34 @@ float AABCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	Stat->ApplyDamage(DamageAmount);
 	return InTrueDamage;
 }
-void AABCharacterBase::OnHit()
-{
-	//PlayHitReaction
-	PlayHitReaction(1.0f);
-}
-void AABCharacterBase::PlayHitReaction(float InBlendInTime)
-{
-	if (HitReactionMontage)
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+void AABCharacterBase::OnHit(float InBlendInTime)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	//PlayHitReaction
+	if (HitReactionMontage && AnimInstance)
+	{
+		OnPreHit();
 		FAlphaBlendArgs BlendArgs;
 		BlendArgs.BlendTime = InBlendInTime;
 		AnimInstance->Montage_PlayWithBlendIn(HitReactionMontage, BlendArgs);
-		
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-
 
 		FOnMontageEnded EndDelegate;
-		EndDelegate.BindLambda([&](UAnimMontage* Montage, bool bInterrupted)
-							   {
-								   GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-							   });
-
+		EndDelegate.BindUObject(this, &AABCharacterBase::OnPostHit);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, HitReactionMontage);
 	}
 }
+
+void AABCharacterBase::OnPreHit()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+}
+
+void AABCharacterBase::OnPostHit(UAnimMontage* Montage, bool bInterrupted)
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
 const int32 AABCharacterBase::GetLevel()
 {
 	return Stat->GetCurrentLevel();

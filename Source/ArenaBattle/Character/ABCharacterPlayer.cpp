@@ -123,6 +123,29 @@ void AABCharacterPlayer::SetupPlayerInputComponent(class UInputComponent* Player
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::Attack);
 }
 
+void AABCharacterPlayer::OnPreHit()
+{
+	Super::OnPreHit();
+
+	APlayerController* PlayerController = Cast< APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
+	
+	
+}
+
+void AABCharacterPlayer::OnPostHit(UAnimMontage* Montage, bool bInterrupted)
+{
+	Super::OnPostHit(Montage, bInterrupted);
+	APlayerController* PlayerController = Cast< APlayerController>(GetController());
+	if (PlayerController)
+	{
+		EnableInput(PlayerController);
+	}
+}
+
 void AABCharacterPlayer::ChangeCharacterControl()
 {
 	switch (CurrentCharacterControlType)
@@ -240,8 +263,8 @@ void AABCharacterPlayer::Attack()
 		OutSkillParams.SkillExtentRate = FVector3f(TotalStat.AttackRangeRate);
 		OutSkillParams.SkillRangeForwardModifier = TotalStat.AttackRangeForward;
 		OutSkillParams.SkillSpeedRate = TotalStat.AttackSpeedRate;
-		BasicSkillComponent->OnSkillBegin.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None); });
-		BasicSkillComponent->OnSkillEnd.BindLambda([&]() { GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking); });
+		BasicSkillComponent->OnSkillBegin.BindLambda([&]() { this->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None); });
+		BasicSkillComponent->OnSkillEnd.BindLambda([&]() { this->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking); }); 
 		if (!BasicSkillComponent->OnSkillSeqBegin.IsBoundToObject(this))
 		{
 			BasicSkillComponent->OnSkillSeqBegin.AddUObject(this, &AABCharacterPlayer::SetSkillDiretion);

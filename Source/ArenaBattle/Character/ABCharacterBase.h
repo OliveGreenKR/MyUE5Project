@@ -49,15 +49,17 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
 	TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
+
 #pragma region Hit Reaction
 protected:
-	virtual void OnHit();
-	virtual void PlayHitReaction(float InBlendInTime = 1.0f);
+	virtual void OnPreHit();
+	virtual void OnPostHit(UAnimMontage* Montage, bool bInterrupted);
+private:
+	void OnHit(float InBlendInTime = 1.0f);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> HitReactionMontage;
-
 #pragma endregion
 #pragma region Manual Redireciton
 protected :
@@ -75,6 +77,8 @@ private:
 	bool bManualReDireciton : 1 = false;
 #pragma endregion
 #pragma region Skill Components
+protected:
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABCharacterSkillComponent> BasicSkillComponent;

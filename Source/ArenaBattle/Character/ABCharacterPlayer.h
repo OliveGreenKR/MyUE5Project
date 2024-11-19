@@ -26,7 +26,8 @@ protected:
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma region HitReaction
-	//virtual void PlayHitReaction(float InBlendInTime = 1.0f) override;
+	void OnPreHit() override;
+	void OnPostHit(UAnimMontage* Montage, bool bInterrupted) override;
 #pragma endregion
 #pragma region Character Control Section
 protected:
