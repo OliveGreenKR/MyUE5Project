@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "ABPlayerController.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogABPlayerController, Log, All);
+
 /**
  * 
  */
@@ -16,6 +18,9 @@ class ARENABATTLE_API AABPlayerController : public APlayerController
 
 public:
 	AABPlayerController();
+
+protected:
+	virtual void BeginPlay() override;
 
 #pragma region GameMode
 protected:
@@ -32,9 +37,15 @@ public :
 	void GameOver();
 	void GameClear();
 #pragma endregion
-	
+#pragma region SaveGame
 protected:
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnGameRetryCountCpp"))
+	void K2_OnGameRetryCount(int32 NewRetryCount);
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SaveGame)
+	TObjectPtr<class UABSaveGame> SaveGameInstance;
+#pragma endregion
 
 
 //#pragma region HUD

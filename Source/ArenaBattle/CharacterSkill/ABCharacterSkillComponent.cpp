@@ -196,6 +196,8 @@ void UABCharacterSkillComponent::SetCoolDownTimer()
 void UABCharacterSkillComponent::CheckSkillCombo()
 {
 	OnSkillSeqEnd.Broadcast();
+	if (CurrentCombo >= SkillData->ComboActionData->MaxComboCount)
+		return;
 	//Check Next Command
 	if (bHasNextComboCommand)
 	{

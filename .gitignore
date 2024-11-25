@@ -57,6 +57,9 @@ Content/*
 # Builds
 Build/*
 
+#Packages
+Package/*
+
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
 Build/*/**
