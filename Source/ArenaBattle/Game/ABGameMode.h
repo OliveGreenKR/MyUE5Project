@@ -18,17 +18,7 @@ public:
 	AABGameMode();
 
 	// Inherited via IABGameInterface
-	void SetPlayerScore(int32 NewPlayerScore) override;
 	void OnPlayerDead() override;
-	bool IsGameCleared() override;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Game)
-	int32 ClearScore;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Game)
-	int32 CurrentScore;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Game)
-	uint8 bIsCleared : 1;
 };

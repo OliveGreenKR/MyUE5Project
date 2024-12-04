@@ -33,7 +33,6 @@ public:
 protected:
 	void ChangeCharacterControl();
 	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
-
 	virtual void SetCharacterControlData(const class UABCharacterControlData* InCharacterControlData) override;
 #pragma endregion
 #pragma region Camera Section

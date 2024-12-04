@@ -95,14 +95,6 @@ void AABCharacterPlayer::SetDead()
 	{
 		//disable input
 		DisableInput(PlayerController);
-
-
-		//request Dead Sequence to GameMode
-		IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
-		if (ABGameMode)
-		{
-			ABGameMode->OnPlayerDead();
-		}
 	}
 
 	
@@ -170,6 +162,11 @@ void AABCharacterPlayer::ChangeCharacterControl()
 
 void AABCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterControlType)
 {
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
+
 	//Load Data Asset From ControlDataMap (Edited in BP)
 	UABCharacterControlData* NewCharacterControl = CharacterControlManager[NewCharacterControlType];
 	check(NewCharacterControl);

@@ -262,18 +262,6 @@ void AABStageGimmick::SetChooseNext()
 
 void AABStageGimmick::OnOpponentDestroyed(AActor* DestroyedActor)
 {
-	IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
-	if (ABGameMode)
-	{
-		//Update Current Score
-		ABGameMode->SetPlayerScore(CurrentStageNum);
-		if (ABGameMode->IsGameCleared())
-		{
-			//Game Cleared
-			return;
-		}
-	}
-
 	SetState(EStageState::REWARD);
 }
 
