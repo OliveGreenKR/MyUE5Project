@@ -4,6 +4,7 @@
 #include "Game/ABGameMode.h"
 #include "Player/ABPlayerController.h"
 #include "ArenaBattle.h"
+#include "Game/ABGameState.h"
 
 AABGameMode::AABGameMode()
 {
@@ -19,6 +20,8 @@ AABGameMode::AABGameMode()
 		PlayerControllerClass = PlayerControllerRef.Class;
 	}
 
+	//GameState
+	GameStateClass = AABGameState::StaticClass();
 }
 
 void AABGameMode::OnPlayerDead()
@@ -43,6 +46,22 @@ void AABGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PostLogin(NewPlayer);
+
+	UNetDriver* NetDriver = GetNetDriver();
+	if (NetDriver)
+	{
+		int32 clientsNum = NetDriver->ClientConnections.Num();
+		AB_LOG(LogABNetwork, Log, TEXT("%d Client Connections."), clientsNum );
+		for (const auto& Connection : NetDriver->ClientConnections)
+		{
+			AB_LOG(LogABNetwork, Log, TEXT("    Client Connections : %s"), *Connection->GetName());
+		}
+	}
+	else
+	{
+		AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("No Net Driver"));
+	}
+
 	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("End"));
 
 }
