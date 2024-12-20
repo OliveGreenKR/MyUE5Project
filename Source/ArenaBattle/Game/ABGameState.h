@@ -17,4 +17,5 @@ class ARENABATTLE_API AABGameState : public AGameStateBase
 public:
 	virtual void HandleBeginPlay() override;
 	virtual void OnRep_ReplicatedHasBegunPlay() override;
+
 };

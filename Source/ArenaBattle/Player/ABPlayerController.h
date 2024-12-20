@@ -24,6 +24,8 @@ protected:
 	virtual void PostNetInit() override;
 	virtual void BeginPlay() override;
 
+	virtual void OnPossess(APawn* InPawn) override;
+
 //#pragma region HUD
 //protected:
 //	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = HUD)
